@@ -17,25 +17,79 @@
 #define PASSWORD_SIZE (8)
 #define SALT_SIZE (2)
 #define NOUSER (-1)
+#define PW_FAILED (1)
+#define PW_AGE (0)
+
+void read_username(char *username);
+void write_pw(int entry, int value, struct pwdb_passwd *p);
 
 /*
-int print_info(const char *username)
+   p->pw_name
+   p->pw_passwd
+   p->pw_uid
+   p->pw_gid
+   p->pw_gecos
+   p->pw_dir
+   p->pw_shell
+   p->pw_age
+   p->pw_failed
+   */
+
+int main(int argc, char **argv)
 {
-	struct pwdb_passwd *p = pwdb_getpwnam(username);
-	if (p != NULL) {
-		printf("Name: %s\n", p->pw_name);
-		printf("Passwd: %s\n", p->pw_passwd);
-		printf("Uid: %u\n", p->pw_uid);
-		printf("Gid: %u\n", p->pw_gid);
-		printf("Real name: %s\n", p->pw_gecos);
-		printf("Home dir: %s\n",p->pw_dir);
-		printf("Shell: %s\n", p->pw_shell);
+	char username[USERNAME_SIZE];
+	char *password;
+	char salt[SALT_SIZE];
+	struct pwdb_passwd *p;
+
+	/* 
+	 * Write "login: " and read user input. Copies the username to the
+	 * username variable.
+	 */
+	read_username(username);
+
+	// Get userinfo for further evaluations (password compare etc.).
+	p = pwdb_getpwnam(username);
+	if (p == NULL) {
+		printf("Unsuccessful login.");
+		return -1;
+	}
+
+	/*
+	 * Write "password: " and read user input. Copies the password to the
+	 * password variable.
+	 */
+	password = getpass("password: ");
+
+	/*
+	 * Here we grab the salt by the given username earlier.
+	 */
+	strncpy(salt, p->pw_passwd, SALT_SIZE);
+
+	/*
+	 * Now it is time to encrypt it with the password input 
+	 * so we can match it with the pwfile and accept/deny user.
+	 */
+	password = crypt(password, salt);
+
+	if (p->pw_failed < 0) {
+		printf("This account has been locked, please contact an administrator.");
+	} else if (strcmp(password, p->pw_passwd) == 0) {
+		printf("Successful login.\n");
+		printf("Previous failed logins: %d\n", p->pw_failed);
+		if (p->pw_age > 10)
+			printf("Your password is old, please consider changing it.");
+		write_pw(PW_AGE, p->pw_age + 1, p);
+		write_pw(PW_FAILED, 0, p);
 		return 0;
 	} else {
-		return NOUSER;
+		printf("Unsuccessful login.");
+		write_pw(PW_FAILED, p->pw_failed + 1, p);
+		if (PW_FAILED > 5)
+			write_pw(PW_FAILED, -1, p);
+		return -1;
 	}
 }
-*/
 
 void read_username(char *username)
 {
@@ -46,72 +100,39 @@ void read_username(char *username)
 	username[strlen(username) - 1] = '\0';
 }
 
-void read_salt(char *password, char *salt)
+void write_pw(int entry, int value, struct pwdb_passwd *p)
 {
-	strncpy(salt, password, SALT_SIZE);
+	if (entry == PW_FAILED) {
+		p->pw_failed = value;
+	} else if (entry == PW_AGE) {
+		p->pw_age = value;
+	} else {
+		printf("Faulty entry passed");
+		return;
+	}
+
+	switch (entry) {
+		case PW_FAILED:
+			p->pw_failed = value;
+			break;
+		case PW_AGE:
+			p->pw_age = value;
+			break;
+		default:
+			printf("Erroneous entry passed to write_pw.");
+			return;
+	}
+
+	if (pwdb_update_user(p) != 0) {
+		printf("pwdb_update_user returned error %s\n",
+				pwdb_err2str(pwdb_errno));
+	}
 }
 
-int main(int argc, char **argv)
-{
-	char username[USERNAME_SIZE];
-	char *password;
-	char salt[SALT_SIZE];
 
-	/* 
-	 * Write "login: " and read user input. Copies the username to the
-	 * username variable.
-	 */
-	read_username(username);
-	// Get userinfo for further evaluations.
-	struct pwdb_passwd *p = pwdb_getpwnam(username);
-	/*
-	 * Write "password: " and read user input. Copies the password to the
-	 * password variable.
-	 */
-	password = getpass("password: ");
-	//printf("%s\n", password);
-	/*
-	 * First get salt of user.
-	 * Now it is time to encrypt it with the password input 
-	 * so we can match it with the pwfile and accept/deny user.
-	 */
-	read_salt(p->pw_passwd, salt);
-	password = crypt(password, salt);
 
-	//int cmp = strcmp(password, p->pw_passwd);
 
-	/*
-	if (cmp < 0)
-		printf("password is less than p->pw_passwd\n");
-	else if (cmp > 0)
-		printf("p->pw_passwd is less than password\n");
-	else if (cmp == 0)
-		printf("password is equal to p->pw_passwd\n");
-	*/
 
-	if (p != NULL && strcmp(password, p->pw_passwd) == 0) {
-		printf("Successful login.");
-		return 0;
-	} else {
-		printf("Unsuccessful login.");
-		return -1;
-	}
-	
-
-	/* Show user info from our local pwfile. */
-	
-	/*
-	if (print_info(username) == NOUSER) {
-		// if there are no user with that username...
-		printf("\nFound no user with name: %s\n", username);   
-		return 0;
-	} else {
-		// if there is a user with that username 
-		printf("\nFound user with name: %s\n", username);
-		return 0;
-	}
-	*/
-}
 
 
 
