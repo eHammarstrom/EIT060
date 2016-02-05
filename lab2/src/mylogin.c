@@ -74,6 +74,7 @@ int main(int argc, char **argv)
 
 	if (p->pw_failed < 0) {
 		printf("This account has been locked, please contact an administrator.");
+		return -1;
 	} else if (strcmp(password, p->pw_passwd) == 0) {
 		printf("Successful login.\n");
 		printf("Previous failed logins: %d\n", p->pw_failed);
