@@ -4,8 +4,8 @@ CFLAGS=-Wall -g
 
 all: openshell_demo pwdblib update_user userinfo
 
-clean:
-	rm -f openshell_demo
-	rm -f pwdblib
-	rm -f update_user
-	rm -f userinfo
+login:
+	$(CC) mylogin.c pwdblib.c -o login $(CFLAGS) -lcrypt
+
+login_clean:
+	rm -f login
