@@ -38,7 +38,10 @@ void write_pw(int entry, int value, struct pwdb_passwd *p);
 int main(int argc, char **argv)
 {
 	char username[USERNAME_SIZE];
-	char *password;
+	char *password;		// This references/stores in memory elsewhere 
+				// and not in this "scope's stack space", 
+				// what does this mean?
+				// Sounds like a possible security flaw.
 	char salt[SALT_SIZE];
 	struct pwdb_passwd *p;
 
