@@ -14,7 +14,7 @@
 
 /* Define some constants. */
 #define USERNAME_SIZE (32)
-#define PASSWORD_SIZE (8)
+// #define PASSWORD_SIZE (8)
 #define SALT_SIZE (2)
 #define NOUSER (-1)
 #define PW_FAILED (1)
@@ -38,10 +38,7 @@ void write_pw(int entry, int value, struct pwdb_passwd *p);
 int main(int argc, char **argv)
 {
 	char username[USERNAME_SIZE];
-	char *password;		// This references/stores in memory elsewhere 
-				// and not in this "scope's stack space", 
-				// what does this mean?
-				// Sounds like a possible security flaw.
+	char *password; // We store in heap, remember to free the memory.
 	char salt[SALT_SIZE];
 	struct pwdb_passwd *p;
 
@@ -77,7 +74,6 @@ int main(int argc, char **argv)
 
 	if (p->pw_failed < 0) {
 		printf("This account has been locked, please contact an administrator.");
-		return -1;
 	} else if (strcmp(password, p->pw_passwd) == 0) {
 		printf("Successful login.\n");
 		printf("Previous failed logins: %d\n", p->pw_failed);
@@ -85,14 +81,17 @@ int main(int argc, char **argv)
 			printf("Your password is old, please consider changing it.");
 		write_pw(PW_AGE, p->pw_age + 1, p);
 		write_pw(PW_FAILED, 0, p);
-		return 0;
 	} else {
 		printf("Unsuccessful login.");
 		write_pw(PW_FAILED, p->pw_failed + 1, p);
 		if (PW_FAILED > 5)
 			write_pw(PW_FAILED, -1, p);
-		return -1;
 	}
+
+	password = malloc(strlen(password));
+	free(password);
+
+	return 0;
 }
 
 void read_username(char *username)
