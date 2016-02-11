@@ -14,7 +14,6 @@
 
 /* Define some constants. */
 #define USERNAME_SIZE (32)
-// #define PASSWORD_SIZE (8)
 #define SALT_SIZE (2)
 #define NOUSER (-1)
 #define PW_FAILED (1)
@@ -73,23 +72,22 @@ int main(int argc, char **argv)
 	password = crypt(password, salt);
 
 	if (p->pw_failed < 0) {
-		printf("This account has been locked, please contact an administrator.");
+		printf("This account has been locked, please contact an administrator.\n");
 	} else if (strcmp(password, p->pw_passwd) == 0) {
 		printf("Successful login.\n");
 		printf("Previous failed logins: %d\n", p->pw_failed);
 		if (p->pw_age > 10)
-			printf("Your password is old, please consider changing it.");
+			printf("Your password is old, please consider changing it.\n");
 		write_pw(PW_AGE, p->pw_age + 1, p);
 		write_pw(PW_FAILED, 0, p);
 	} else {
-		printf("Unsuccessful login.");
+		printf("Unsuccessful login.\n");
 		write_pw(PW_FAILED, p->pw_failed + 1, p);
 		if (PW_FAILED > 5)
 			write_pw(PW_FAILED, -1, p);
 	}
 
-	password = malloc(strlen(password));
-	free(password);
+	memset(password, '0', strlen(password));
 
 	return 0;
 }
