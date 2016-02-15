@@ -1,28 +1,31 @@
 package utilities;
 
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
+import java.io.IOException;
+import java.util.logging.FileHandler;
 import java.util.logging.Logger;
-
-import org.json.simple.JSONObject;
+import java.util.logging.SimpleFormatter;
 
 public class Log {
-
-	public static void main(String[] args){
-		
-	      JSONObject obj = new JSONObject();
-	      
-	      String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(Calendar.getInstance().getTime());
+	private static Logger logger;
+	private FileHandler fh;
 	
-	      obj.put("When", timeStamp);
-	      obj.put("Who", "Doctor who");
-	      obj.put("Where", "Division X");
+	public Log() {
+		logger = Logger.getLogger("MyLog");
 
-	      System.out.print(obj);
-	   }
+		try {
+			fh = new FileHandler("/Users/Atlas/desktop/test1.log");
+			logger.addHandler(fh);
+	        SimpleFormatter formatter = new SimpleFormatter();  
+	        fh.setFormatter(formatter);  
+	        
+		} catch (SecurityException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} 		
+	}	
 	
-	public void logEvent(String who, String where) {
-		
+	public static void logEventInfo(String info) {
+		logger.info(info);
 	}
-	
 }
