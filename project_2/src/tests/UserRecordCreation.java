@@ -1,6 +1,9 @@
 package tests;
 
+import java.util.logging.Logger;
+
 import utilities.Doctor;
+import utilities.Log;
 import utilities.Nurse;
 import utilities.Patient;
 import utilities.Record;
@@ -9,6 +12,7 @@ import utilities.User;
 public class UserRecordCreation {
 
 	public static void main(String[] args) {
+
 		Doctor doc_1 = new Doctor("doctor", "password", User.DIV_EMERGENCY, 1);
 		Nurse nurse_1 = new Nurse("nurse", "password", User.DIV_REHAB, 2);
 		Nurse nurse_2 = new Nurse("nurse 2", "password", User.DIV_EMERGENCY, 4);
