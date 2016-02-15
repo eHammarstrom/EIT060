@@ -1,0 +1,12 @@
+Emil Hammarström
+Uppfattar det som att setuid ändrar real UID tillgot och sparar ditt gamla real UID. Ex. setuid till root och d sparas emil till saved set-user-ID. Detta är för att när programmet med setuid har körts färdigt s vet den inte vem jag var förut? För att bde real UID och effective UID har satts till ngon annan och d används saved set-user-ID för att "komma tillbaks".
+Emil Hammarström
+
+21:07
+Emil Hammarström
+seteuid är det som operativsystemet använder när det avgör vad som VERKLIGEN fr göras enligt access control. Detta innebär att seteuid vill ge emil effective UID till root s gr ej det, det högsta som fr sättas är real UID. Allts när man skriver e.x. SU i terminal (för att logga in som root) s sätts real-ID till root, effective UID till root och saved set-user ID till emil.
+Emil Hammarström
+
+21:08
+Emil Hammarström
+Det är fortfarande lite otydligt men detta har jag krypt runt lite överallt för att kunna greppa. Folk säger "Läs dokumentationen" osv. men den är inte s jäkla tydlig. 
