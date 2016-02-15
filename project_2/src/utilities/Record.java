@@ -22,6 +22,10 @@ public class Record {
 		patient.addRecord(this);
 	}
 	
+	public String toString() {
+		return Integer.toString(id);
+	}
+  	
 	public void read(User user) {
 		if (user.getPermissions() == PermissionLevel.Nurse) {
 			if (user.getDivision() == division) {
