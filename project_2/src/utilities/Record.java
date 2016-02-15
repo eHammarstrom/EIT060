@@ -16,6 +16,10 @@ public class Record {
 		this.division = division;
 		this.medicalData = medicalData;
 		this.id = id;
+
+		doctor.addRecord(this);
+		nurse.addRecord(this);
+		patient.addRecord(this);
 	}
 	
 	public void read(User user) {
