@@ -23,7 +23,13 @@ public class Record {
 	}
 	
 	public void read(User user) {
-		
+		if (user.getPermissions() == PermissionLevel.Nurse) {
+			if (user.getDivision() == division) {
+				System.out.println("I can read this.");
+			} else {
+				System.out.println("I am a nurse, but this is not my division nor my patient.");
+			}
+		}
 	}
 	
 	public void write(User user) {
