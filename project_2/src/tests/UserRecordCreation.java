@@ -1,9 +1,6 @@
 package tests;
 
-import java.util.logging.Logger;
-
 import utilities.Doctor;
-import utilities.Log;
 import utilities.Nurse;
 import utilities.Patient;
 import utilities.Record;

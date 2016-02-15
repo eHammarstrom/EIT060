@@ -1,31 +1,29 @@
 package utilities;
 
-import java.io.IOException;
-import java.util.logging.FileHandler;
-import java.util.logging.Logger;
-import java.util.logging.SimpleFormatter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.PrintWriter;
+import java.util.Calendar;
 
 public class Log {
-	private static Logger logger;
-	private FileHandler fh;
+	private static final String logName = "action_log";
+	private static File logFile;
+	private static PrintWriter printWriter;
 	
-	public Log() {
-		logger = Logger.getLogger("MyLog");
+	public static void append(String info) {
+		logFile = new File(logName);
 
 		try {
-			fh = new FileHandler("/Users/Atlas/desktop/test1.log");
-			logger.addHandler(fh);
-	        SimpleFormatter formatter = new SimpleFormatter();  
-	        fh.setFormatter(formatter);  
-	        
-		} catch (SecurityException e) {
+			printWriter = new PrintWriter(new FileWriter(logFile, true));
+
+			printWriter.print(Calendar.getInstance().getTime().toString() + "\t");
+			printWriter.print(info + "\n");
+			printWriter.flush();
+
+			printWriter.close();
+		} catch (Exception e) {
 			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		} 		
-	}	
-	
-	public static void logEventInfo(String info) {
-		logger.info(info);
+		}
 	}
+
 }

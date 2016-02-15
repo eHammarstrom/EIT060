@@ -27,6 +27,8 @@ public class Record {
 	}
   	
 	public void read(User user) {
+		Log.append(user.toString());
+
 		if (user.getPermissions() == PermissionLevel.Nurse) {
 			if (user.getDivision() == division) {
 				System.out.println("I can read this.");
