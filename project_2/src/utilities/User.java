@@ -1,9 +1,10 @@
 package utilities;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import org.mindrot.jbcrypt.BCrypt;
 
-public abstract class User {
+public abstract class User implements Serializable {
 	public static final String DIV_EMERGENCY = "div_emergency";
 	public static final String DIV_ACTIVECARE = "div_activecare";
 	public static final String DIV_REHAB = "div_rehab";

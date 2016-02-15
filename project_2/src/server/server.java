@@ -65,16 +65,16 @@ public class server implements Runnable {
 					}
 				}
 
-				if (login != null) {
-					oos.writeObject(login);
-					oos.flush();
-					System.out.println("Sent object.");
-				} else {
-					out.println(clientMsg);
-					out.flush();
-					System.out.println("Sent text.");
-				}
+				if (login != null)
+					System.out.println("Sending: \n" + login.toString());
+				else
+					System.out.println("Sending: NULL");
+
+				oos.writeObject(login);
+				oos.flush();
+				System.out.println("Sent object.");
 			}
+
 			in.close();
 			out.close();
 			socket.close();
