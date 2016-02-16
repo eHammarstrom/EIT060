@@ -11,7 +11,6 @@
 #include <unistd.h>
 #include <pwd.h>
 #include <signal.h>
-#include <sys/wait.h>
 #include "pwdblib.h"   /* include header declarations for pwdblib.c */
 
 /* Define some constants. */
@@ -20,9 +19,7 @@
 #define NOUSER (-1)
 #define PW_FAILED (1)
 #define PW_AGE (0)
-#define PROGRAM "/usr/bin/xterm"
 
-int start_userterm(struct pwdb_passwd *p);
 void read_username(char *username);
 void write_pw(int entry, int value, struct pwdb_passwd *p);
 
@@ -87,8 +84,6 @@ int main(int argc, char **argv)
 			printf("Your password is old, please consider changing it.\n");
 		write_pw(PW_AGE, p->pw_age + 1, p);
 		write_pw(PW_FAILED, 0, p);
-
-		start_userterm(p);
 	} else {
 		printf("Unsuccessful login.\n");
 		write_pw(PW_FAILED, p->pw_failed + 1, p);
@@ -99,30 +94,6 @@ int main(int argc, char **argv)
 	memset(password, '0', strlen(password));
 
 	return 0;
-}
-
-int start_userterm(struct pwdb_passwd *p)
-{
-	pid_t pid;
-	int status;
-
-	pid = fork();
-
-	if (pid == 0) {
-		setgid(p->pw_gid);
-		setuid(p->pw_uid);
-		execl(PROGRAM, PROGRAM, "-e", p->pw_shell, "-l", NULL);
-		_exit(-1);
-	} else if (pid < 0) {
-		printf("Fork failed.");
-		status = -1;
-	} else {
-		if (waitpid(pid, &status, 0) != pid) {
-			status = -1;
-		}
-	}
-
-	return status;
 }
 
 void read_username(char *username)

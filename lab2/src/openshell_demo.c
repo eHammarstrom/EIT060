@@ -10,6 +10,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <unistd.h>
+#include <sys/wait.h>
 
 #define PROGRAM "/usr/bin/xterm"
 
