@@ -8,12 +8,12 @@ public class Log {
 	private static final String LOG_NAME = "action_log";
 	private static PrintWriter printWriter;
 	
-	public static void append(String info) {
+	public static void append(String info, String operation) {
 		try {
 			printWriter = new PrintWriter(new FileWriter(LOG_NAME, true));
 
 			printWriter.print(Calendar.getInstance().getTime().toString() + "\t");
-			printWriter.print(info + "\n");
+			printWriter.print(info + "\t" + operation + "\n");
 			printWriter.flush();
 
 			printWriter.close();
