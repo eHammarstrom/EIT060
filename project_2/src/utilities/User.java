@@ -24,6 +24,10 @@ public abstract class User implements Serializable {
 		this.records = new ArrayList<Record>();
 	}
 	
+	public int getCertNbr() {
+		return certNbr;
+	}
+	
 	public String getDivision() {
 		return division;
 	}
@@ -54,19 +58,19 @@ public abstract class User implements Serializable {
 		StringBuilder sb = new StringBuilder();
 		
 		sb.append(username);
-		sb.append("\n");
+	//	sb.append("\n");
 		sb.append("\t");
-		sb.append(password);
-		sb.append("\n");
-		sb.append("\t");
+	//	sb.append(password);
+	//	sb.append("\n");
+	//	sb.append("\t");
 		sb.append(division);
-		sb.append("\n");
+	//	sb.append("\n");
 		sb.append("\t");
 		sb.append(certNbr);
-		sb.append("\n");
+	//	sb.append("\n");
 		sb.append("\t");
 		sb.append(permLevel);
-		sb.append("\n");
+	//	sb.append("\n");
 		if (records != null) {
 			for (Record r : records) {
 				sb.append("\t" + r.toString());
