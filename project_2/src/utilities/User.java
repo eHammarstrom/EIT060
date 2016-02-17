@@ -12,11 +12,11 @@ public abstract class User implements Serializable {
 	private String username;
 	private String password;
 	private String division;
-	private int certNbr;
+	private long certNbr;
 	protected PermissionLevel permLevel;
 	private ArrayList<Record> records;
 	
-	public User(String username, String password, String division, int certNbr) {
+	public User(String username, String password, String division, long certNbr) {
 		this.username = username;
 		this.password = BCrypt.hashpw(password, BCrypt.gensalt());
 		this.division = division;
@@ -24,7 +24,15 @@ public abstract class User implements Serializable {
 		this.records = new ArrayList<Record>();
 	}
 	
-	public int getCertNbr() {
+	public String getPassword() {
+		return password;
+	}
+	
+	public String getUsername() {
+		return username;
+	}
+	
+	public long getCertNbr() {
 		return certNbr;
 	}
 	
