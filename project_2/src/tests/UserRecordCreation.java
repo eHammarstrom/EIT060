@@ -1,7 +1,6 @@
 package tests;
 
 import utilities.Agency;
-import utilities.Db;
 import utilities.Doctor;
 import utilities.Nurse;
 import utilities.Patient;

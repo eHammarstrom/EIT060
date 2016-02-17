@@ -32,13 +32,12 @@ public class server implements Runnable {
 			SSLSession session = socket.getSession();
 			X509Certificate cert = (X509Certificate) session.getPeerCertificateChain()[0];
 			numConnectedClients++;
-			System.out.println("client connected");
-			System.out.println("client name (cert subject DN field): " + cert.getSubjectDN().getName());
-			System.out.println(numConnectedClients + " concurrent connection(s)\n");
-			System.out.println("issuer name (cert issuer DN field): " + cert.getIssuerDN().getName());
-			System.out.println("serial number (cert serial number field): " + cert.getSerialNumber().toString());
+			System.out.println(numConnectedClients + " active connections.");
+			System.out.println("Client connection received:");
+			System.out.println("User DN: " + cert.getSubjectDN().getName());
+			System.out.println("Issuer DN: " + cert.getIssuerDN().getName());
+			System.out.println("Serial N: " + cert.getSerialNumber().toString());
 
-			PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
 			BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 			ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());
 
@@ -69,7 +68,6 @@ public class server implements Runnable {
 			}
 
 			in.close();
-			out.close();
 			socket.close();
 			numConnectedClients--;
 			System.out.println("client disconnected");
