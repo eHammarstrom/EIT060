@@ -37,19 +37,19 @@ public class DBFileHandler {
 				User u = null;
 
 				if (permLevel.equals("Doctor")) {
-					u = new Doctor(username, password, division, id);
+					u = new Doctor(username, password, division, id, true);
 				}
 
 				if (permLevel.equals("Nurse")) {
-					u = new Nurse(username, password, division, id);
+					u = new Nurse(username, password, division, id, true);
 				}
 
 				if (permLevel.equals("Patient")) {
-					u = new Patient(username, password, division, id);
+					u = new Patient(username, password, division, id, true);
 				}
 
 				if (permLevel.equals("Agency")) {
-					u = new Agency(username, password, division, id);
+					u = new Agency(username, password, division, id, true);
 				}
 
 				users.add(u);

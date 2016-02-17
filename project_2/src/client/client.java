@@ -4,9 +4,11 @@ import java.io.*;
 import javax.net.ssl.*;
 import javax.security.cert.X509Certificate;
 
+import utilities.Record;
 import utilities.User;
 
 import java.security.KeyStore;
+import java.util.ArrayList;
 
 /*
  * This example shows how to set up a key manager to perform client
@@ -82,6 +84,7 @@ public class client {
 			ObjectInputStream ois = new ObjectInputStream(socket.getInputStream());
 
 			User user;
+			ArrayList<Record> records = new ArrayList<Record>();
 			String msg;
 			for (;;) {
 				System.out.print(">");
@@ -97,10 +100,28 @@ public class client {
 
 				user = (User) ois.readObject();
 				
-				if (user != null)
+				if (user != null) {
 					System.out.println(user.toString());
-				else
+
+					for (;;) {
+						try {
+							records.add((Record) ois.readObject());
+						} catch (Exception e) {
+							ois.close();
+							break;
+						}
+					}
+				} else {
 					System.out.println("obj is NULL");
+				}
+				
+				System.out.println("We left.");
+				
+				if (!records.isEmpty()) {
+					for (Record r : records) {
+						System.out.println(r.toString());
+					}
+				}
 			}
 
 			out.close();

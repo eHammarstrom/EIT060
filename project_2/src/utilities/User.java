@@ -16,9 +16,14 @@ public abstract class User implements Serializable {
 	protected PermissionLevel permLevel;
 	private ArrayList<Record> records;
 	
-	public User(String username, String password, String division, long certNbr) {
+	public User(String username, String password, String division, long certNbr, boolean readMode) {
 		this.username = username;
-		this.password = BCrypt.hashpw(password, BCrypt.gensalt());
+
+		if (readMode)
+			this.password = password;
+		else
+			this.password = BCrypt.hashpw(password, BCrypt.gensalt(12));
+
 		this.division = division;
 		this.certNbr = certNbr;
 		this.records = new ArrayList<Record>();
@@ -44,22 +49,26 @@ public abstract class User implements Serializable {
 		return permLevel;
 	}
 	
+	public boolean isAssociated(Record r) {
+		for (Record tempRecord : records) {
+			if (tempRecord.getId() == r.getId()) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+	
 	public void addRecord(Record r) {
 		records.add(r);
 	}
 	
-	public User login(String username, String password) {
-		if (username.equals(this.username) && BCrypt.checkpw(password, this.password)) {
-			System.out.println("Matched login.");
+	public User login(String recvUsername, String recvPassword) {
+		if (recvUsername.equals(username) && BCrypt.checkpw(recvPassword, password)) {
 			return this;
 		} else {
-			System.out.println("Login error.");
 			return null;
 		}
-	}
-	
-	public void loadUser() {
-		// Here we call the class which loads the json user file.
 	}
 
 	public String toString() {

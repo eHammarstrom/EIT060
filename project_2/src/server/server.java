@@ -1,27 +1,36 @@
 package server;
 
-import java.io.*;
-import java.net.*;
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.ObjectOutputStream;
+import java.net.ServerSocket;
 import java.security.KeyStore;
 import java.util.ArrayList;
 
-import javax.net.*;
-import javax.net.ssl.*;
+import javax.net.ServerSocketFactory;
+import javax.net.ssl.KeyManagerFactory;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLServerSocket;
+import javax.net.ssl.SSLServerSocketFactory;
+import javax.net.ssl.SSLSession;
+import javax.net.ssl.SSLSocket;
+import javax.net.ssl.TrustManagerFactory;
 import javax.security.cert.X509Certificate;
 
-import utilities.Doctor;
+import utilities.DBFileHandler;
 import utilities.User;
+import utilities.Record;
 
 public class server implements Runnable {
 	private ServerSocket serverSocket = null;
 	private static int numConnectedClients = 0;
-
 	private ArrayList<User> users;
+	private ArrayList<Record> records;
 
 	public server(ServerSocket ss) throws IOException {
 		serverSocket = ss;
-		users = new ArrayList<User>();
-		users.add(new Doctor("test", "test", User.DIV_EMERGENCY, 1));
 		newListener();
 	}
 
@@ -33,27 +42,27 @@ public class server implements Runnable {
 			X509Certificate cert = (X509Certificate) session.getPeerCertificateChain()[0];
 			numConnectedClients++;
 			System.out.println(numConnectedClients + " active connections.");
-			System.out.println("Client connection received:");
+			System.out.println("Client connection received: ");
 			System.out.println("User DN: " + cert.getSubjectDN().getName());
 			System.out.println("Issuer DN: " + cert.getIssuerDN().getName());
 			System.out.println("Serial N: " + cert.getSerialNumber().toString());
 
 			BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 			ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());
+			users = DBFileHandler.loadUsers();
+			records = DBFileHandler.loadRecords();
 
 			String clientMsg = null;
 			while ((clientMsg = in.readLine()) != null) {
 				String[] splitMsg = clientMsg.split("\\s+");
 				User login = null;
 
-				for (String s : splitMsg) {
-					System.out.println(s);
-				}
-
 				if (splitMsg[0].equalsIgnoreCase("login") && splitMsg.length == 3) {
-					System.out.println("Login query.");
 					for (User u : users) {
 						login = u.login(splitMsg[1], splitMsg[2]);
+
+						if (login != null)
+							break;
 					}
 				}
 
@@ -64,7 +73,17 @@ public class server implements Runnable {
 
 				oos.writeObject(login);
 				oos.flush();
-				System.out.println("Sent object.");
+				
+				if (login != null && !records.isEmpty()) {
+					for (Record r : records) {
+						if (login.isAssociated(r)) {
+							oos.writeObject(r);
+							oos.flush();
+						}
+					}
+				}
+
+				oos.close();
 			}
 
 			in.close();
