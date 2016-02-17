@@ -7,9 +7,9 @@ public class Record {
 	private Patient patient;
 	private String division;
 	private String medicalData;
-	private int id;
+	private long id;
 
-	public Record(Doctor doctor, Nurse nurse, Patient patient, String division, String medicalData, int id) {
+	public Record(Doctor doctor, Nurse nurse, Patient patient, String division, String medicalData, long id) {
 		this.doctor = doctor;
 		this.nurse = nurse;
 		this.patient = patient;
@@ -22,15 +22,15 @@ public class Record {
 		patient.addRecord(this);
 	}
 	
-	public int getDoctorCertNbr() {
+	public long getDoctorCertNbr() {
 		return doctor.getCertNbr();
 	}
 	
-	public int getNurseCertNbr() {
+	public long getNurseCertNbr() {
 		return nurse.getCertNbr();
 	}
 	
-	public int getPatientCertNbr() {
+	public long getPatientCertNbr() {
 		return patient.getCertNbr();
 	}
 	
@@ -42,12 +42,12 @@ public class Record {
 		return medicalData;
 	}
 	
-	public int getId() {
+	public long getId() {
 		return id;
 	}
 
 	public String toString() {
-		return Integer.toString(id);
+		return Long.toString(id);
 	}
 
 	public void read(User user) {
