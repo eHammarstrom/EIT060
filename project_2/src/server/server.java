@@ -133,29 +133,29 @@ public class server implements Runnable {
 						break;
 					}
 					
-					Record getRecord = null;
+					Boolean recordAccess = null;
 					
 					if (commandSplit[0].equalsIgnoreCase("read")) {
 						System.out.println("READ");
-						getRecord = loggedInUser.readRecord(rec);
+						recordAccess = loggedInUser.readRecord(rec);
 					}
 
 					if (commandSplit[0].equalsIgnoreCase("write")) {
 						System.out.println("WRITE");
-						getRecord = loggedInUser.writeRecord(rec);
+						recordAccess = loggedInUser.writeRecord(rec);
 					}
 
 					if (commandSplit[0].equalsIgnoreCase("create")) {
 						System.out.println("EDIT");
-						getRecord = loggedInUser.createRecord(rec);
+						recordAccess = loggedInUser.createRecord(rec);
 					}
 
 					if (commandSplit[0].equalsIgnoreCase("delete")) {
 						System.out.println("DELETE");
-						getRecord = loggedInUser.deleteRecord(rec);
+						recordAccess = loggedInUser.deleteRecord(rec);
 					}
 					
-					if(getRecord != null) {
+					if(recordAccess == true) {
 						printWriter.println("yes");
 						printWriter.flush();
 					} 
