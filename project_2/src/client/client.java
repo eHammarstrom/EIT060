@@ -129,12 +129,12 @@ public class client {
 				System.out.println("Type help for commands.\n");
 				System.out.print(user.getUsername() + " commands>");
 				msg = read.readLine();
-				splitMsg = msg.split("\\+s");
+				splitMsg = msg.split("\\s+");
 				
 				for(String s : splitMsg) {
 					System.out.println(s);
 				}
-
+				
 				if (msg.equalsIgnoreCase("quit")) {
 					break;
 				} else if (splitMsg[0].equalsIgnoreCase("help")) {
