@@ -1,3 +1,4 @@
+
 package server;
 
 import java.io.BufferedReader;
@@ -32,6 +33,7 @@ public class server implements Runnable {
 	public server(ServerSocket ss) throws IOException {
 		serverSocket = ss;
 		newListener();
+
 	}
 
 	public void run() {
@@ -52,38 +54,95 @@ public class server implements Runnable {
 			users = DBFileHandler.loadUsers();
 			records = DBFileHandler.loadRecords();
 
-			String clientMsg = null;
-			while ((clientMsg = in.readLine()) != null) {
-				String[] splitMsg = clientMsg.split("\\s+");
-				User login = null;
 
-				if (splitMsg[0].equalsIgnoreCase("login") && splitMsg.length == 3) {
-					for (User u : users) {
-						login = u.login(splitMsg[1], splitMsg[2]);
-
-						if (login != null)
-							break;
-					}
-				}
-
-				if (login != null)
-					System.out.println("Sending: \n" + login.toString());
-				else
-					System.out.println("Sending: NULL");
-
-				oos.writeObject(login);
-				oos.flush();
+			if (true) {
 				
-				if (login != null && !records.isEmpty()) {
-					for (Record r : records) {
-						if (login.isAssociated(r)) {
-							oos.writeObject(r);
-							oos.flush();
+				String clientMsg = null;
+				User loggedInUser = null;
+				
+				while ((clientMsg = in.readLine()) != null) {
+					String[] splitMsg = clientMsg.split("\\s+");
+					User login = null;
+
+					if (splitMsg[0].equalsIgnoreCase("login") && splitMsg.length == 3) {
+
+						for (User u : users) {
+							login = u.login(splitMsg[1], splitMsg[2]);
+							loggedInUser = u;
+							if (login != null)
+								break;
 						}
 					}
+
+					if (login != null)
+						System.out.println("Sending: \n" + login.toString());
+					else
+						System.out.println("Sending: NULL");
+
+					if (login != null && !records.isEmpty()) {
+						for (Record r : records) {
+							if (login.isAssociated(r)) {
+								oos.writeObject(r);
+								oos.flush();
+							}
+						}
+					}
+					
+				 //	oos.close();
 				}
 
-				oos.close();
+				System.out.println("AFTER LOGIN ATTEMPT!");
+
+				String command = null;
+
+				while ((command = in.readLine()) != null) {
+					String[] commandSplit = command.split("\\s+");
+					
+					Record rec = null;
+					
+					for(Record r : records) {
+						if(Long.parseLong(commandSplit[1]) == r.getId()) {
+							System.out.println("FOUND RECORD");
+							rec = r;
+							break;
+						}
+					}
+					
+					if(rec == null) {
+						System.out.println("RECORD DOES NOT EXIST!");
+						break;
+					}
+					
+					Record getRecord = null;
+					
+					if (commandSplit[0].equalsIgnoreCase("read")) {
+						System.out.println("READ");
+						getRecord = loggedInUser.readRecord(rec);
+					}
+
+					if (commandSplit[0].equalsIgnoreCase("write")) {
+						System.out.println("WRITE");
+						getRecord = loggedInUser.writeRecord(rec);
+					}
+
+					if (commandSplit[0].equalsIgnoreCase("create")) {
+						System.out.println("EDIT");
+						getRecord = loggedInUser.createRecord(rec);
+					}
+
+					if (commandSplit[0].equalsIgnoreCase("delete")) {
+						System.out.println("DELETE");
+						getRecord = loggedInUser.deleteRecord(rec);
+					}
+					
+					if(getRecord != null) {
+						oos.writeObject(getRecord);
+						oos.flush();
+					}
+					
+					oos.close();
+				}
+
 			}
 
 			in.close();
@@ -91,11 +150,16 @@ public class server implements Runnable {
 			numConnectedClients--;
 			System.out.println("client disconnected");
 			System.out.println(numConnectedClients + " concurrent connection(s)\n");
-		} catch (IOException e) {
+		} catch (
+
+		IOException e)
+
+		{
 			System.out.println("Client died: " + e.getMessage());
 			e.printStackTrace();
 			return;
 		}
+
 	}
 
 	private void newListener() {

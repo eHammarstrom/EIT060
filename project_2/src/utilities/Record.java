@@ -52,7 +52,7 @@ public class Record implements Serializable {
 		return Long.toString(id);
 	}
 
-	public void read(User user) {
+	public Record read(User user) {
 		String operation = "DENIED READ ACCESS";
 
 		if (user.getPermissions().equals(PermissionLevel.Agency)) {
@@ -88,12 +88,18 @@ public class Record implements Serializable {
 				System.out.println("DENIED READ ACCESS!");
 			}
 		}
-
+		
 		Log.append(user.toString(), operation);
+		
+		if(operation.equals("READ")) {
+			return this;
+		} else {
+			return null;
+		}
 
 	}
 
-	public void write(User user) {
+	public Record write(User user) {
 		String operation = "DENIED WRITE ACCESS";
 
 		if (user.getPermissions().equals(PermissionLevel.Doctor)) {
@@ -117,10 +123,16 @@ public class Record implements Serializable {
 		}
 
 		Log.append(user.toString(), operation);
+		
+		if(operation.equals("WRITE")) {
+			return this;
+		} else {
+			return null;
+		}
 
 	}
 
-	public void create(User user) {
+	public Record create(User user) {
 		String operation = "DENIED CREATE ACCESS";
 
 		if (user.getPermissions().equals(PermissionLevel.Doctor) && user.getCertNbr() == doctor.getCertNbr()) {
@@ -131,9 +143,15 @@ public class Record implements Serializable {
 		}
 
 		Log.append(user.toString(), operation);
+		
+		if(operation.equals("WRITE")) {
+			return this;
+		} else {
+			return null;
+		}
 	}
 
-	public void delete(User user) {
+	public Record delete(User user) {
 		String operation = "DENIED DELETE ACCESS";
 
 		if (user.getPermissions().equals(PermissionLevel.Agency)) {
@@ -143,6 +161,12 @@ public class Record implements Serializable {
 		}
 
 		Log.append(user.toString(), operation);
+		
+		if(operation.equals("WRITE")) {
+			return this;
+		} else {
+			return null;
+		}
 
 	}
 
