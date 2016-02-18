@@ -21,7 +21,7 @@ import java.util.ArrayList;
  */
 public class client {
 	private static User user;
-	private static ArrayList<Record> records = new ArrayList<Record>();
+	private static ArrayList<Record> records;
 
 	private static BufferedReader read;
 	private static BufferedReader serverMsg;
@@ -94,6 +94,7 @@ public class client {
 			serverMsg = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 			out = new PrintWriter(socket.getOutputStream(), true);
 			ois = new ObjectInputStream(socket.getInputStream());
+			records = new ArrayList<Record>();
 
 			boolean isShutdown = false;
 			boolean isLoggedIn = false;
@@ -129,6 +130,10 @@ public class client {
 				System.out.print(user.getUsername() + " commands>");
 				msg = read.readLine();
 				splitMsg = msg.split("\\+s");
+				
+				for(String s : splitMsg) {
+					System.out.println(s);
+				}
 
 				if (msg.equalsIgnoreCase("quit")) {
 					break;
@@ -144,7 +149,9 @@ public class client {
 						editRecord(splitMsg[1]);
 					}
 				} else if (splitMsg[0].equalsIgnoreCase("read")) {
+					System.out.println("Inside read");
 					if (recordExists(splitMsg[1])) {
+						System.out.println("Inside read if-state");
 						out.println(msg);
 						out.flush();
 					} else {
@@ -261,15 +268,18 @@ public class client {
 
 		if (user != null) {
 			System.out.println(user.toString());
+			
+			records = (ArrayList<Record>) ois.readObject();
 
-			for (;;) {
-				try {
-					records.add((Record) ois.readObject());
-				} catch (Exception e) {
-					ois.close();
-					break;
-				}
-			}
+//			for (;;) {
+//				try {
+//					records.add((Record) ois.readObject());
+//				} catch (Exception e) {
+//					ois.close();
+//					break;
+//				}
+//			}
+			
 		} else {
 			return false;
 		}

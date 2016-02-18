@@ -6,6 +6,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.ObjectOutputStream;
+import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.security.KeyStore;
 import java.util.ArrayList;
@@ -51,16 +52,18 @@ public class server implements Runnable {
 
 			BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 			ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());
+			PrintWriter printWriter = new PrintWriter(socket.getOutputStream());
 			users = DBFileHandler.loadUsers();
 			records = DBFileHandler.loadRecords();
-
+		
 
 			if (true) {
 				
 				String clientMsg = null;
 				User loggedInUser = null;
 				
-				while ((clientMsg = in.readLine()) != null) {
+				while (loggedInUser == null) {
+					clientMsg = in.readLine();
 					String[] splitMsg = clientMsg.split("\\s+");
 					User login = null;
 
@@ -69,9 +72,13 @@ public class server implements Runnable {
 						for (User u : users) {
 							login = u.login(splitMsg[1], splitMsg[2]);
 							loggedInUser = u;
-							if (login != null)
+							if (login != null) {
 								break;
+							}
 						}
+						
+						oos.writeObject(loggedInUser);
+						oos.flush();
 					}
 
 					if (login != null)
@@ -80,27 +87,40 @@ public class server implements Runnable {
 						System.out.println("Sending: NULL");
 
 					if (login != null && !records.isEmpty()) {
-						for (Record r : records) {
+						
+						ArrayList<Record> userRecords = new ArrayList<Record>();
+						
+						for (Record r : records) {							
 							if (login.isAssociated(r)) {
-								oos.writeObject(r);
-								oos.flush();
+								userRecords.add(r);
 							}
 						}
+						
+						oos.writeObject(userRecords);
+						oos.flush();
 					}
 					
-				 //	oos.close();
+				//	oos.close();
+			
 				}
 
 				System.out.println("AFTER LOGIN ATTEMPT!");
 
 				String command = null;
+				
+			//	in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 
 				while ((command = in.readLine()) != null) {
 					String[] commandSplit = command.split("\\s+");
 					
+					for(String s : commandSplit) {
+						System.out.println(s);
+					}
+					
 					Record rec = null;
 					
 					for(Record r : records) {
+						System.out.println(r.getId());
 						if(Long.parseLong(commandSplit[1]) == r.getId()) {
 							System.out.println("FOUND RECORD");
 							rec = r;
@@ -136,15 +156,17 @@ public class server implements Runnable {
 					}
 					
 					if(getRecord != null) {
-						oos.writeObject(getRecord);
-						oos.flush();
-					}
+						printWriter.println("yes");
+						printWriter.flush();
+					} 
 					
-					oos.close();
+				//	oos.close();
 				}
 
 			}
-
+			
+			printWriter.close();
+			oos.close();
 			in.close();
 			socket.close();
 			numConnectedClients--;
