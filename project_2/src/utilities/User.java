@@ -75,11 +75,8 @@ public abstract class User implements Serializable {
 		return r.delete(this);
 	}
 	
-	public Record addRecord(Record r) {
-		
-		return null;
-		
-		// return records.add(r);
+	public void addRecord(Record r) {
+		records.add(r);
 	}
 	
 	public User login(String recvUsername, String recvPassword) {
