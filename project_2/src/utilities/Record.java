@@ -23,27 +23,27 @@ public class Record implements Serializable {
 		nurse.addRecord(this);
 		patient.addRecord(this);
 	}
-	
+
 	public long getDoctorCertNbr() {
 		return doctor.getCertNbr();
 	}
-	
+
 	public long getNurseCertNbr() {
 		return nurse.getCertNbr();
 	}
-	
+
 	public long getPatientCertNbr() {
 		return patient.getCertNbr();
 	}
-	
+
 	public String getDivision() {
 		return division;
 	}
-	
+
 	public String getMedicalData() {
 		return medicalData;
 	}
-	
+
 	public long getId() {
 		return id;
 	}
@@ -53,7 +53,7 @@ public class Record implements Serializable {
 	}
 
 	public void read(User user) {
-		String operation = "OPERATION";
+		String operation = "DENIED READ ACCESS";
 
 		if (user.getPermissions().equals(PermissionLevel.Agency)) {
 			System.out.println("I can read this. /Agency");
@@ -94,14 +94,55 @@ public class Record implements Serializable {
 	}
 
 	public void write(User user) {
+		String operation = "DENIED WRITE ACCESS";
+
+		if (user.getPermissions().equals(PermissionLevel.Doctor)) {
+			if (user.getCertNbr() == doctor.getCertNbr()) {
+				System.out.println("I can write to this. /Doctor");
+				operation = "WRITE";
+			} else {
+				System.out.println("I am a doctor, but this is not my division nor my patient!");
+				operation = "DENIED WRITE ACCESS";
+			}
+		}
+
+		if (user.getPermissions().equals(PermissionLevel.Nurse)) {
+			if (user.getDivision().equals(division) && user.getCertNbr() == nurse.getCertNbr()) {
+				System.out.println("I can write to this. /Nurse");
+				operation = "WRITE";
+			} else {
+				System.out.println("I am a nurse, but this is not my division nor my patient.");
+				operation = "DENIED WRITE ACCESS";
+			}
+		}
+
+		Log.append(user.toString(), operation);
 
 	}
 
 	public void create(User user) {
+		String operation = "DENIED CREATE ACCESS";
 
+		if (user.getPermissions().equals(PermissionLevel.Doctor) && user.getCertNbr() == doctor.getCertNbr()) {
+			System.out.println("I can creat new record. /Doctor");
+			operation = "CREATE";
+		} else {
+			operation = "DENIED CREATE ACCESS";
+		}
+
+		Log.append(user.toString(), operation);
 	}
 
 	public void delete(User user) {
+		String operation = "DENIED DELETE ACCESS";
+
+		if (user.getPermissions().equals(PermissionLevel.Agency)) {
+			operation = "DELETE";
+		} else {
+			operation = "DENIED DELETE ACCESS";
+		}
+
+		Log.append(user.toString(), operation);
 
 	}
 
