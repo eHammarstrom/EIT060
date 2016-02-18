@@ -59,19 +59,19 @@ public abstract class User implements Serializable {
 		return false;
 	}
 	
-	public Record readRecord(Record r) {
+	public boolean readRecord(Record r) {
 		return r.read(this);
 	}
 	
-	public Record writeRecord(Record r) {
+	public boolean writeRecord(Record r) {
 		return r.write(this);
 	}
 	
-	public Record createRecord(Record r) {
+	public boolean createRecord(Record r) {
 		return r.create(this);
 	}
 	
-	public Record deleteRecord(Record r) {
+	public boolean deleteRecord(Record r) {
 		return r.delete(this);
 	}
 	
