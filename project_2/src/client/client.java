@@ -4,6 +4,7 @@ import java.io.*;
 import javax.net.ssl.*;
 import javax.security.cert.X509Certificate;
 
+import utilities.PermissionLevel;
 import utilities.Record;
 import utilities.User;
 
@@ -19,6 +20,16 @@ import java.util.ArrayList;
  * the firewall by following SSLSocketClientWithTunneling.java.
  */
 public class client {
+	private static User user;
+	private static ArrayList<Record> records = new ArrayList<Record>();
+
+	private static BufferedReader read;
+	private static BufferedReader serverMsg;
+	private static PrintWriter out;
+	private static ObjectInputStream ois;
+
+	private static String msg;
+	private static String[] splitMsg;
 
 	public static void main(String[] args) throws Exception {
 		String host = null;
@@ -79,47 +90,90 @@ public class client {
 			System.out.println("Issuer DN: " + cert.getIssuerDN().getName());
 			System.out.println("Serial N: " + cert.getSerialNumber().toString());
 
-			BufferedReader read = new BufferedReader(new InputStreamReader(System.in));
-			PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
-			ObjectInputStream ois = new ObjectInputStream(socket.getInputStream());
+			read = new BufferedReader(new InputStreamReader(System.in));
+			serverMsg = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+			out = new PrintWriter(socket.getOutputStream(), true);
+			ois = new ObjectInputStream(socket.getInputStream());
 
-			User user;
-			ArrayList<Record> records = new ArrayList<Record>();
-			String msg;
-			for (;;) {
-				System.out.print(">");
+			boolean isShutdown = false;
+			boolean isLoggedIn = false;
+			boolean isDone = false;
+
+			while (!isLoggedIn) {
+				System.out.println("Provide login command: login <username> <password> \n");
+				System.out.print("Login >");
 
 				msg = read.readLine();
 
 				if (msg.equalsIgnoreCase("quit")) {
+					isShutdown = true;
 					break;
 				}
 
 				out.println(msg);
 				out.flush();
 
-				user = (User) ois.readObject();
-				
-				if (user != null) {
-					System.out.println(user.toString());
+				isLoggedIn = waitForLoginData();
+			}
 
-					for (;;) {
-						try {
-							records.add((Record) ois.readObject());
-						} catch (Exception e) {
-							ois.close();
-							break;
-						}
+			if (isShutdown) {
+				out.close();
+				read.close();
+				socket.close();
+
+				return;
+			}
+
+			while (!isDone) {
+				System.out.println("Type help for commands.\n");
+				System.out.print(user.getUsername() + " commands>");
+				msg = read.readLine();
+				splitMsg = msg.split("\\+s");
+
+				if (msg.equalsIgnoreCase("quit")) {
+					break;
+				} else if (splitMsg[0].equalsIgnoreCase("help")) {
+					printHelp();
+				} else if (splitMsg[0].equalsIgnoreCase("records")) {
+					printRecords();
+				} else if (splitMsg[0].equalsIgnoreCase("edit")) {
+					out.println(msg);
+					out.flush();
+
+					if (serverMsg.readLine().equalsIgnoreCase("yes")) {
+						editRecord(splitMsg[1]);
 					}
-				} else {
-					System.out.println("obj is NULL");
-				}
-				
-				System.out.println("We left.");
-				
-				if (!records.isEmpty()) {
-					for (Record r : records) {
-						System.out.println(r.toString());
+				} else if (splitMsg[0].equalsIgnoreCase("read")) {
+					if (recordExists(splitMsg[1])) {
+						out.println(msg);
+						out.flush();
+					} else {
+						System.out.println("Record does not exists.");
+					}
+
+					if (serverMsg.readLine().equalsIgnoreCase("yes")) {
+						printRecord(splitMsg[1]);
+					} else {
+						System.out.println("Access denied.");
+					}
+				} else if (splitMsg[0].equalsIgnoreCase("delete") && user.getPermissions() == PermissionLevel.Agency) {
+					if (recordExists(splitMsg[1])) {
+						out.println(msg);
+						out.flush();
+					} else {
+						System.out.println("Record does not exists.");
+					}
+
+					if (serverMsg.readLine().equalsIgnoreCase("yes")) {
+						System.out.println("Record deleted.");
+						
+						for (Record r : records) {
+							if (r.getId() == Long.parseLong(splitMsg[1])) {
+								r.delete(user);
+							}
+						}
+					} else {
+						System.out.println("Access denied.");
 					}
 				}
 			}
@@ -130,6 +184,103 @@ public class client {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+
+	private static boolean recordExists(String rNbr) {
+		boolean exists = false;
+
+		for (Record r : records) {
+			if (r.getId() == Long.parseLong(splitMsg[1])) {
+				exists = true;
+			}
+		}
+
+		return exists;
+	}
+
+	private static void editRecord(String rNbr) throws IOException {
+		Record record = null;
+		boolean isDone = false;
+
+		for (Record r : records) {
+			if (r.getId() == Long.parseLong(rNbr)) {
+				record = r;
+			}
+		}
+
+		if (record == null) {
+			System.out.println("Given record does not exist.");
+		} else if (serverMsg.readLine().equalsIgnoreCase("no")) {
+			System.out.println("You do not have the permissions to edit this record.");
+		} else {
+			while (!isDone) {
+				System.out.print(record.getMedicalData());
+
+				msg = read.readLine();
+
+				System.out.println("Done editing or start over? <yes>/<no>/<cancel>");
+				String ans = read.readLine();
+
+				if (ans.equalsIgnoreCase("yes")) {
+					out.println(msg);
+					out.flush();
+					isDone = true;
+					System.out.println("Successfully edited record.");
+				}
+			}
+		}
+	}
+
+	private static void printHelp() {
+		System.out.println("records - This retrieves a list of available records.");
+		System.out.println("read <record nbr>");
+
+		if (user.getPermissions() != PermissionLevel.Patient)
+			System.out.println("edit <record nbr>");
+
+		if (user.getPermissions() == PermissionLevel.Agency)
+			System.out.println("delete <record nbr>");
+	}
+
+	private static void printRecords() {
+		for (Record r : records) {
+			System.out.println(r.toString());
+		}
+	}
+
+	private static void printRecord(String rNbr) {
+		for (Record r : records) {
+			if (r.getId() == Long.parseLong(rNbr)) {
+				System.out.println(r.getMedicalData());
+			}
+		}
+	}
+
+	private static boolean waitForLoginData() throws IOException, ClassNotFoundException {
+		user = (User) ois.readObject();
+
+		if (user != null) {
+			System.out.println(user.toString());
+
+			for (;;) {
+				try {
+					records.add((Record) ois.readObject());
+				} catch (Exception e) {
+					ois.close();
+					break;
+				}
+			}
+		} else {
+			return false;
+		}
+
+		if (!records.isEmpty()) {
+			for (Record r : records) {
+				System.out.println(r.toString());
+			}
+		}
+
+		return true;
 	}
 
 }
