@@ -12,8 +12,8 @@ import java.util.Map;
 public class Database {
 
 	private static Connection conn;
-	private static ArrayList<User> users;
-	private static ArrayList<Record> records;
+	private ArrayList<User> users;
+	private ArrayList<Record> records;
 
 	public Database() {
 		conn = null;
@@ -57,7 +57,6 @@ public class Database {
 			String sql = "SELECT doctor, nurse, patient, division, medicalData, id FROM records";
 			statement = conn.prepareStatement(sql);
 			ResultSet result = statement.executeQuery();
-			records = new ArrayList<Record>();
 
 			while (result.next()) {
 
@@ -66,7 +65,7 @@ public class Database {
 				Patient patient = (Patient) getUser(result.getLong("patient"));
 				String division = result.getString("division");
 				String medicalData = result.getString("medicalData");
-				long id = result.getLong("certNbr");
+				long id = result.getLong("id");
 
 				Record r = new Record(doctor, nurse, patient, division, medicalData, id);
 
@@ -90,6 +89,15 @@ public class Database {
 
 	}
 
+	private Record getRecord(long id) {
+		for (Record r : records) {
+			if (r.getId() == id) {
+				return r;
+			}
+		}
+		return null;
+	}
+
 	private User getUser(long certNbr) {
 		for (User u : users) {
 			if (u.getCertNbr() == certNbr) {
@@ -99,14 +107,15 @@ public class Database {
 		return null;
 	}
 
-	public static ArrayList<User> getUsers() {
+	public ArrayList<User> getUsers() {
 
 		PreparedStatement statement = null;
 		try {
 			String sql = "SELECT username, password, division, certNbr, permissionLevel, certNbr FROM users2";
 			statement = conn.prepareStatement(sql);
 			ResultSet result = statement.executeQuery();
-			ArrayList<User> users = new ArrayList<User>();
+			
+			users = new ArrayList<User>();
 
 			while (result.next()) {
 
@@ -153,12 +162,75 @@ public class Database {
 		return null;
 	}
 
-	public static void main(String[] args) {
-		Database db = new Database();
-		db.openConnection();
-		ArrayList<User> list = getUsers();
-		for (User u : list) {
-			System.out.println(u.getUsername() + " " + u.getCertNbr());
+	public void insertUser(User u) {
+
+		PreparedStatement statement = null;
+		try {
+			String sql = "INSERT INTO users2(username, password, division, permissionLevel, certNbr) VALUES(?,?,?,?,?)";
+			statement = conn.prepareStatement(sql);
+			statement.setString(1, u.getUsername());
+			statement.setString(2, u.getPassword());
+			statement.setString(3, u.getDivision());
+			statement.setString(4, u.getPermissions().toString());
+			statement.setLong(5, u.getCertNbr());
+			statement.executeUpdate();
+			
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				statement.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
 		}
 	}
+	
+	public void insertRecord(Record r) {
+
+		PreparedStatement statement = null;
+		try {
+			String sql = "INSERT INTO records(doctor, nurse, patient, division, medicalData, id) VALUES(?,?,?,?,?,?)";
+			statement = conn.prepareStatement(sql);
+			statement.setLong(1, r.getDoctorCertNbr());
+			statement.setLong(2, r.getNurseCertNbr());
+			statement.setLong(3, r.getPatientCertNbr());
+			statement.setString(4, r.getDivision());
+			statement.setString(5, r.getMedicalData());
+			statement.setLong(6, r.getId());
+			statement.executeUpdate();
+			
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				statement.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+	
+	public void loadTestData() {
+		Doctor doc_1 = new Doctor("doctor", "password", User.DIV_EMERGENCY, 1, false);
+		Nurse nurse_1 = new Nurse("nurse", "password", User.DIV_REHAB, 2, false);
+		Nurse nurse_2 = new Nurse("nurse2", "password", User.DIV_EMERGENCY, 3, false);
+		Patient patient_1 = new Patient("patient", "password", User.DIV_REHAB, 4, false);
+		Agency agency_1 = new Agency("Agency", "password", User.DIV_REHAB, 5, false);
+
+		Record r = new Record(doc_1, nurse_1, patient_1, User.DIV_REHAB, "Ont i benet", 10);
+		Record r2 = new Record(doc_1, nurse_1, patient_1, User.DIV_REHAB, "Ont i armen", 11);
+		
+		this.insertUser(doc_1);
+		this.insertUser(nurse_1);
+		this.insertUser(nurse_2);
+		this.insertUser(patient_1);
+		this.insertUser(agency_1);
+		
+		this.insertRecord(r);
+		this.insertRecord(r2);
+	}
+
 }
