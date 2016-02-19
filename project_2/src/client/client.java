@@ -124,9 +124,9 @@ public class client {
 
 				return;
 			}
-
-			boolean accessDenied = false;
+			
 			while (!isDone) {
+				boolean accessDenied = false;
 				if (accessDenied) {
 					System.out.println("Access denied.");
 				} else {

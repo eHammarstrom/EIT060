@@ -21,8 +21,13 @@ import javax.net.ssl.SSLSocket;
 import javax.net.ssl.TrustManagerFactory;
 import javax.security.cert.X509Certificate;
 
+import utilities.Agency;
 import utilities.DBFileHandler;
+import utilities.Database;
+import utilities.Doctor;
 import utilities.Log;
+import utilities.Nurse;
+import utilities.Patient;
 import utilities.User;
 import utilities.Record;
 
@@ -31,6 +36,8 @@ public class server implements Runnable {
 	private static int numConnectedClients = 0;
 	private ArrayList<User> users;
 	private ArrayList<Record> records;
+	private ArrayList<User> users2;
+	private ArrayList<Record> records2;
 
 	public server(ServerSocket ss) throws IOException {
 		serverSocket = ss;
@@ -54,8 +61,16 @@ public class server implements Runnable {
 			BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 			ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());
 			PrintWriter printWriter = new PrintWriter(socket.getOutputStream());
-			users = DBFileHandler.loadUsers();
-			records = DBFileHandler.loadRecords();
+	//		users = DBFileHandler.loadUsers();
+	//		records = DBFileHandler.loadRecords();
+			
+			Database db = new Database();
+			db.openConnection();
+	//		db.loadTestData();
+
+			users = db.getUsers();
+			records = db.getRecords();
+			
 
 			if (true) {
 
