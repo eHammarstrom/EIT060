@@ -22,6 +22,7 @@ import javax.net.ssl.TrustManagerFactory;
 import javax.security.cert.X509Certificate;
 
 import utilities.DBFileHandler;
+import utilities.Log;
 import utilities.User;
 import utilities.Record;
 
@@ -98,17 +99,9 @@ public class server implements Runnable {
 						oos.writeObject(userRecords);
 						oos.flush();
 					}
-
-					// oos.close();
-
 				}
 
-				System.out.println("AFTER LOGIN ATTEMPT!");
-
 				String command = null;
-
-				// in = new BufferedReader(new
-				// InputStreamReader(socket.getInputStream()));
 
 				while ((command = in.readLine()) != null) {
 					String[] commandSplit = command.split("\\s+");
@@ -136,38 +129,44 @@ public class server implements Runnable {
 					boolean recordAccess = true;
 
 					if (commandSplit[0].equalsIgnoreCase("read")) {
-						System.out.println("READ");
+						Log.append(loggedInUser.toString(), Log.READ);
+
 						recordAccess = loggedInUser.readRecord(rec);
 						returnAccess(recordAccess, printWriter);
 					}
 
 					if (commandSplit[0].equalsIgnoreCase("edit")) {
-						System.out.println("EDIT");
+						Log.append(loggedInUser.toString(), Log.EDIT);
+
 						recordAccess = loggedInUser.writeRecord(rec);
 						returnAccess(recordAccess, printWriter);
-						
+
 						if (recordAccess) {
 							rec.write(in.readLine());
 						}
 					}
 
 					if (commandSplit[0].equalsIgnoreCase("create")) {
-						System.out.println("EDIT");
+						Log.append(loggedInUser.toString(), Log.CREATE);
+
 						recordAccess = loggedInUser.createRecord(rec);
 						returnAccess(recordAccess, printWriter);
-						
+
 						if (recordAccess) {
 							String[] recordData = in.readLine().split("\\s+");
 						}
 					}
 
 					if (commandSplit[0].equalsIgnoreCase("delete")) {
-						System.out.println("DELETE");
+						Log.append(loggedInUser.toString(), Log.DELETE);
+
 						recordAccess = loggedInUser.deleteRecord(rec);
 						returnAccess(recordAccess, printWriter);
-					}
 
-					// oos.close();
+						if (recordAccess) {
+							rec.delete();
+						}
+					}
 				}
 
 			}

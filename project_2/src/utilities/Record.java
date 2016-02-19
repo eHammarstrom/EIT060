@@ -17,7 +17,7 @@ public class Record implements Serializable {
 		this.patient = patient;
 		this.division = division;
 		this.medicalData = medicalData;
-		this.id = id;
+		this.id = id; // This should be setup to be auto incremented when added to the DB.
 
 		doctor.addRecord(this);
 		nurse.addRecord(this);
@@ -134,7 +134,7 @@ public class Record implements Serializable {
 	
 	public void write(String data) {
 		medicalData = data;
-		// here we need to write to json file, cause change.
+		// here we need to write to the DB file, cause change.
 	}
 
 	public boolean create(User user) {
@@ -173,6 +173,10 @@ public class Record implements Serializable {
 			return false;
 		}
 
+	}
+
+	public void delete() {
+		// Here we must update doctor, nurse, and patient of their loss of record and then write this to the DB
 	}
 
 }

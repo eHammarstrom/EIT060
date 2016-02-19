@@ -5,6 +5,11 @@ import java.io.PrintWriter;
 import java.util.Calendar;
 
 public class Log {
+	public static final String EDIT = "EDIT";
+	public static final String CREATE = "CREATE";
+	public static final String READ = "READ";
+	public static final String DELETE = "DELETE";
+
 	private static final String LOG_NAME = "action_log";
 	private static PrintWriter printWriter;
 	
