@@ -67,8 +67,12 @@ public abstract class User implements Serializable {
 		return r.write(this);
 	}
 	
-	public boolean createRecord(Record r) {
-		return r.create(this);
+	public boolean createRecord() {
+		if (permLevel == PermissionLevel.Doctor) {
+			return true;
+		}
+
+		return false;
 	}
 	
 	public boolean deleteRecord(Record r) {

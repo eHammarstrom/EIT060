@@ -149,7 +149,7 @@ public class server implements Runnable {
 					if (commandSplit[0].equalsIgnoreCase("create")) {
 						Log.append(loggedInUser.toString(), Log.CREATE);
 
-						recordAccess = loggedInUser.createRecord(rec);
+						recordAccess = loggedInUser.createRecord();
 						returnAccess(recordAccess, printWriter);
 
 						if (recordAccess) {

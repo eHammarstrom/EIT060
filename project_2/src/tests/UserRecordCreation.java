@@ -27,21 +27,6 @@ public class UserRecordCreation {
 		// System.out.println(nurse_1.toString());
 		// System.out.println(nurse_2.toString());
 		// System.out.println(patient_1.toString());
-
-		r.read(nurse_1);
-		r.read(doc_1);
-		r.read(nurse_2);
-		r.read(patient_1);
-		r.read(agency_1);
-		
-		r.write(patient_1);
-		r.write(doc_1);
-		
-		r.create(agency_1);
-		r.create(doc_1);
-		
-		r.delete(doc_1);
-		r.delete(agency_1);
 			
 		DBFileHandler.appendRecordToDB(r);
 		DBFileHandler.appendRecordToDB(r2);

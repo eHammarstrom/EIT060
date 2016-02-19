@@ -17,7 +17,8 @@ public class Record implements Serializable {
 		this.patient = patient;
 		this.division = division;
 		this.medicalData = medicalData;
-		this.id = id; // This should be setup to be auto incremented when added to the DB.
+		this.id = id; // This should be setup to be auto incremented when added
+						// to the DB.
 
 		doctor.addRecord(this);
 		nurse.addRecord(this);
@@ -53,130 +54,48 @@ public class Record implements Serializable {
 	}
 
 	public boolean read(User user) {
-		String operation = "DENIED READ ACCESS";
-
 		if (user.getPermissions().equals(PermissionLevel.Agency)) {
-			System.out.println("I can read this. /Agency");
-			operation = "READ";
-		}
-
-		if (user.getPermissions().equals(PermissionLevel.Doctor)) {
-			if (user.getDivision().equals(division) || user.getCertNbr() == doctor.getCertNbr()) {
-				System.out.println("I can read this. /Doctor");
-				operation = "READ";
-			} else {
-				System.out.println("I am a doctor, but this is not my division nor my patient!");
-				operation = "DENIED READ ACCESS";
-			}
-		}
-
-		if (user.getPermissions().equals(PermissionLevel.Nurse)) {
-			if (user.getDivision().equals(division)) {
-				System.out.println("I can read this. /Nurse");
-				operation = "READ";
-			} else {
-				System.out.println("I am a nurse, but this is not my division nor my patient.");
-				operation = "DENIED READ ACCESS";
-			}
-		}
-
-		if (user.getPermissions().equals(PermissionLevel.Patient)) {
-			if (user.getCertNbr() == patient.getCertNbr()) {
-				System.out.println("I can read this. /Patient");
-				operation = "READ";
-			} else {
-				System.out.println("DENIED READ ACCESS!");
-			}
-		}
-		
-		Log.append(user.toString(), operation);
-		
-		if(operation.equals("READ")) {
 			return true;
-		} else {
-			return false;
+		} else if (user.getPermissions().equals(PermissionLevel.Doctor)
+				&& (user.getDivision().equals(division) || user.getCertNbr() == doctor.getCertNbr())) {
+			return true;
+		} else if (user.getPermissions().equals(PermissionLevel.Nurse)
+				&& (user.getDivision().equals(division) || user.getCertNbr() == nurse.getCertNbr())) {
+			return true;
+		} else if (user.getPermissions().equals(PermissionLevel.Patient)
+				&& user.getCertNbr() == patient.getCertNbr()) {
+			return true;
 		}
-
+			
+		return false;
 	}
 
 	public boolean write(User user) {
-		String operation = "DENIED WRITE ACCESS";
-
-		if (user.getPermissions().equals(PermissionLevel.Doctor)) {
-			if (user.getCertNbr() == doctor.getCertNbr()) {
-				System.out.println("I can write to this. /Doctor");
-				operation = "WRITE";
-			} else {
-				System.out.println("I am a doctor, but this is not my division nor my patient!");
-				operation = "DENIED WRITE ACCESS";
-			}
-		}
-
-		if (user.getPermissions().equals(PermissionLevel.Nurse)) {
-			if (user.getDivision().equals(division) && user.getCertNbr() == nurse.getCertNbr()) {
-				System.out.println("I can write to this. /Nurse");
-				operation = "WRITE";
-			} else {
-				System.out.println("I am a nurse, but this is not my division nor my patient.");
-				operation = "DENIED WRITE ACCESS";
-			}
-		}
-
-		Log.append(user.toString(), operation);
-		
-		if(operation.equals("WRITE")) {
+		if (user.getPermissions().equals(PermissionLevel.Doctor) && user.getDivision().equals(doctor.getDivision())) {
 			return true;
-		} else {
-			return false;
+		} else if (user.getPermissions().equals(PermissionLevel.Nurse) && user.getCertNbr() == nurse.getCertNbr()) {
+			return true;
 		}
 
+		return false;
 	}
-	
+
 	public void write(String data) {
 		medicalData = data;
 		// here we need to write to the DB file, cause change.
 	}
 
-	public boolean create(User user) {
-		String operation = "DENIED CREATE ACCESS";
-
-		if (user.getPermissions().equals(PermissionLevel.Doctor) && user.getCertNbr() == doctor.getCertNbr()) {
-			System.out.println("I can creat new record. /Doctor");
-			operation = "CREATE";
-		} else {
-			operation = "DENIED CREATE ACCESS";
-		}
-
-		Log.append(user.toString(), operation);
-		
-		if(operation.equals("WRITE")) {
-			return true;
-		} else {
-			return false;
-		}
-	}
-
 	public boolean delete(User user) {
-		String operation = "DENIED DELETE ACCESS";
-
 		if (user.getPermissions().equals(PermissionLevel.Agency)) {
-			operation = "DELETE";
-		} else {
-			operation = "DENIED DELETE ACCESS";
-		}
-
-		Log.append(user.toString(), operation);
-		
-		if(operation.equals("WRITE")) {
 			return true;
-		} else {
-			return false;
 		}
 
+		return false;
 	}
 
 	public void delete() {
-		// Here we must update doctor, nurse, and patient of their loss of record and then write this to the DB
+		// Here we must update doctor, nurse, and patient of their loss of
+		// record and then write this to the DB
 	}
 
 }
