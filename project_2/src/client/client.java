@@ -125,35 +125,37 @@ public class client {
 				return;
 			}
 
+			boolean accessDenied = false;
 			while (!isDone) {
-				System.out.println("Type help for commands.\n");
+				if (accessDenied) {
+					System.out.println("Access denied.");
+				} else {
+					printHelp();
+				}
+
 				System.out.print(user.getUsername() + " commands>");
 				msg = read.readLine();
 				splitMsg = msg.split("\\s+");
 
 				if (msg.equalsIgnoreCase("quit")) {
 					break;
-				} else if (splitMsg[0].equalsIgnoreCase("help")) {
-					printHelp();
 				} else if (splitMsg[0].equalsIgnoreCase("records")) {
 					printRecords();
-				} else if (splitMsg[0].equalsIgnoreCase("edit") && recordExists(splitMsg[1]) && hasPermissions(msg)) {
+				} else if (splitMsg[0].equalsIgnoreCase("edit") 
+						&& recordExists(splitMsg[1]) 
+						&& (accessDenied = hasPermissions(msg))) {
 					editRecord(splitMsg[1]);
-				} else if (splitMsg[0].equalsIgnoreCase("read")) {
-					if (recordExists(splitMsg[1]) && hasPermissions(msg)) {
-						printRecord(splitMsg[1]);
-					} else {
-						System.out.println("Access denied.");
-					}
-				} else if (splitMsg[0].equalsIgnoreCase("delete")) {
-					if (recordExists(splitMsg[1]) && hasPermissions(msg)) {
-						for (Record r : records) {
-							if (r.getId() == Long.parseLong(splitMsg[1])) {
-								r.delete(user);
-							}
+				} else if (splitMsg[0].equalsIgnoreCase("read") 
+						&& recordExists(splitMsg[1]) 
+						&& (accessDenied = hasPermissions(msg))) {
+					printRecord(splitMsg[1]);
+				} else if (splitMsg[0].equalsIgnoreCase("delete")
+						&& recordExists(splitMsg[1]) 
+						&& (accessDenied = hasPermissions(msg))) {
+					for (Record r : records) {
+						if (r.getId() == Long.parseLong(splitMsg[1])) {
+							r.delete(user);
 						}
-					} else {
-						System.out.println("Access denied.");
 					}
 				}
 			}
