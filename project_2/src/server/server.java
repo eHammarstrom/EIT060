@@ -55,13 +55,12 @@ public class server implements Runnable {
 			PrintWriter printWriter = new PrintWriter(socket.getOutputStream());
 			users = DBFileHandler.loadUsers();
 			records = DBFileHandler.loadRecords();
-		
 
 			if (true) {
-				
+
 				String clientMsg = null;
 				User loggedInUser = null;
-				
+
 				while (loggedInUser == null) {
 					clientMsg = in.readLine();
 					String[] splitMsg = clientMsg.split("\\s+");
@@ -76,7 +75,7 @@ public class server implements Runnable {
 								break;
 							}
 						}
-						
+
 						oos.writeObject(loggedInUser);
 						oos.flush();
 					}
@@ -87,84 +86,92 @@ public class server implements Runnable {
 						System.out.println("Sending: NULL");
 
 					if (login != null && !records.isEmpty()) {
-						
+
 						ArrayList<Record> userRecords = new ArrayList<Record>();
-						
-						for (Record r : records) {							
+
+						for (Record r : records) {
 							if (login.isAssociated(r)) {
 								userRecords.add(r);
 							}
 						}
-						
+
 						oos.writeObject(userRecords);
 						oos.flush();
 					}
-					
-				//	oos.close();
-			
+
+					// oos.close();
+
 				}
 
 				System.out.println("AFTER LOGIN ATTEMPT!");
 
 				String command = null;
-				
-			//	in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+
+				// in = new BufferedReader(new
+				// InputStreamReader(socket.getInputStream()));
 
 				while ((command = in.readLine()) != null) {
 					String[] commandSplit = command.split("\\s+");
-					
-					for(String s : commandSplit) {
+
+					for (String s : commandSplit) {
 						System.out.println(s);
 					}
-					
+
 					Record rec = null;
-					
-					for(Record r : records) {
+
+					for (Record r : records) {
 						System.out.println(r.getId());
-						if(Long.parseLong(commandSplit[1]) == r.getId()) {
+						if (Long.parseLong(commandSplit[1]) == r.getId()) {
 							System.out.println("FOUND RECORD");
 							rec = r;
 							break;
 						}
 					}
-					
-					if(rec == null) {
+
+					if (rec == null) {
 						System.out.println("RECORD DOES NOT EXIST!");
 						break;
 					}
-					
-					Boolean recordAccess = null;
-					
+
+					boolean recordAccess = true;
+
 					if (commandSplit[0].equalsIgnoreCase("read")) {
 						System.out.println("READ");
 						recordAccess = loggedInUser.readRecord(rec);
+						returnAccess(recordAccess, printWriter);
 					}
 
-					if (commandSplit[0].equalsIgnoreCase("write")) {
-						System.out.println("WRITE");
+					if (commandSplit[0].equalsIgnoreCase("edit")) {
+						System.out.println("EDIT");
 						recordAccess = loggedInUser.writeRecord(rec);
+						returnAccess(recordAccess, printWriter);
+						
+						if (recordAccess) {
+							rec.write(in.readLine());
+						}
 					}
 
 					if (commandSplit[0].equalsIgnoreCase("create")) {
 						System.out.println("EDIT");
 						recordAccess = loggedInUser.createRecord(rec);
+						returnAccess(recordAccess, printWriter);
+						
+						if (recordAccess) {
+							String[] recordData = in.readLine().split("\\s+");
+						}
 					}
 
 					if (commandSplit[0].equalsIgnoreCase("delete")) {
 						System.out.println("DELETE");
 						recordAccess = loggedInUser.deleteRecord(rec);
+						returnAccess(recordAccess, printWriter);
 					}
-					
-					if(recordAccess == true) {
-						printWriter.println("yes");
-						printWriter.flush();
-					} 
-					
-				//	oos.close();
+
+					// oos.close();
 				}
 
 			}
-			
+
 			printWriter.close();
 			oos.close();
 			in.close();
@@ -182,6 +189,16 @@ public class server implements Runnable {
 			return;
 		}
 
+	}
+
+	private void returnAccess(boolean ans, PrintWriter printWriter) {
+		if (ans == true) {
+			printWriter.println("granted");
+			printWriter.flush();
+		} else {
+			printWriter.println("denied");
+			printWriter.flush();
+		}
 	}
 
 	private void newListener() {

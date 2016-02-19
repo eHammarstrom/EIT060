@@ -130,50 +130,23 @@ public class client {
 				System.out.print(user.getUsername() + " commands>");
 				msg = read.readLine();
 				splitMsg = msg.split("\\s+");
-				
-				for(String s : splitMsg) {
-					System.out.println(s);
-				}
-				
+
 				if (msg.equalsIgnoreCase("quit")) {
 					break;
 				} else if (splitMsg[0].equalsIgnoreCase("help")) {
 					printHelp();
 				} else if (splitMsg[0].equalsIgnoreCase("records")) {
 					printRecords();
-				} else if (splitMsg[0].equalsIgnoreCase("edit")) {
-					out.println(msg);
-					out.flush();
-
-					if (serverMsg.readLine().equalsIgnoreCase("yes")) {
-						editRecord(splitMsg[1]);
-					}
+				} else if (splitMsg[0].equalsIgnoreCase("edit") && recordExists(splitMsg[1]) && hasPermissions(msg)) {
+					editRecord(splitMsg[1]);
 				} else if (splitMsg[0].equalsIgnoreCase("read")) {
-					System.out.println("Inside read");
-					if (recordExists(splitMsg[1])) {
-						System.out.println("Inside read if-state");
-						out.println(msg);
-						out.flush();
-					} else {
-						System.out.println("Record does not exists.");
-					}
-
-					if (serverMsg.readLine().equalsIgnoreCase("yes")) {
+					if (recordExists(splitMsg[1]) && hasPermissions(msg)) {
 						printRecord(splitMsg[1]);
 					} else {
 						System.out.println("Access denied.");
 					}
-				} else if (splitMsg[0].equalsIgnoreCase("delete") && user.getPermissions() == PermissionLevel.Agency) {
-					if (recordExists(splitMsg[1])) {
-						out.println(msg);
-						out.flush();
-					} else {
-						System.out.println("Record does not exists.");
-					}
-
-					if (serverMsg.readLine().equalsIgnoreCase("yes")) {
-						System.out.println("Record deleted.");
-						
+				} else if (splitMsg[0].equalsIgnoreCase("delete")) {
+					if (recordExists(splitMsg[1]) && hasPermissions(msg)) {
 						for (Record r : records) {
 							if (r.getId() == Long.parseLong(splitMsg[1])) {
 								r.delete(user);
@@ -191,6 +164,17 @@ public class client {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+
+	private static boolean hasPermissions(String msg) throws IOException {
+		out.println(msg);
+		out.flush();
+
+		if (serverMsg.readLine().equalsIgnoreCase("granted")) {
+			return true;
+		}
+
+		return false;
 	}
 
 	private static boolean recordExists(String rNbr) {
@@ -215,25 +199,17 @@ public class client {
 			}
 		}
 
-		if (record == null) {
-			System.out.println("Given record does not exist.");
-		} else if (serverMsg.readLine().equalsIgnoreCase("no")) {
-			System.out.println("You do not have the permissions to edit this record.");
-		} else {
-			while (!isDone) {
-				System.out.print(record.getMedicalData());
+		while (!isDone) {
+			System.out.print(record.getMedicalData());
+			msg = read.readLine();
+			System.out.println("Done editing or start over? <yes>/<no>/<cancel>");
+			String ans = read.readLine();
 
-				msg = read.readLine();
-
-				System.out.println("Done editing or start over? <yes>/<no>/<cancel>");
-				String ans = read.readLine();
-
-				if (ans.equalsIgnoreCase("yes")) {
-					out.println(msg);
-					out.flush();
-					isDone = true;
-					System.out.println("Successfully edited record.");
-				}
+			if (ans.equalsIgnoreCase("yes")) {
+				out.println(msg);
+				out.flush();
+				isDone = true;
+				System.out.println("Successfully edited record.");
 			}
 		}
 	}
@@ -241,12 +217,8 @@ public class client {
 	private static void printHelp() {
 		System.out.println("records - This retrieves a list of available records.");
 		System.out.println("read <record nbr>");
-
-		if (user.getPermissions() != PermissionLevel.Patient)
-			System.out.println("edit <record nbr>");
-
-		if (user.getPermissions() == PermissionLevel.Agency)
-			System.out.println("delete <record nbr>");
+		System.out.println("edit <record nbr>");
+		System.out.println("delete <record nbr>");
 	}
 
 	private static void printRecords() {
@@ -268,18 +240,18 @@ public class client {
 
 		if (user != null) {
 			System.out.println(user.toString());
-			
+
 			records = (ArrayList<Record>) ois.readObject();
 
-//			for (;;) {
-//				try {
-//					records.add((Record) ois.readObject());
-//				} catch (Exception e) {
-//					ois.close();
-//					break;
-//				}
-//			}
-			
+			// for (;;) {
+			// try {
+			// records.add((Record) ois.readObject());
+			// } catch (Exception e) {
+			// ois.close();
+			// break;
+			// }
+			// }
+
 		} else {
 			return false;
 		}

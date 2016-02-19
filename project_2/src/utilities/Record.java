@@ -131,6 +131,11 @@ public class Record implements Serializable {
 		}
 
 	}
+	
+	public void write(String data) {
+		medicalData = data;
+		// here we need to write to json file, cause change.
+	}
 
 	public boolean create(User user) {
 		String operation = "DENIED CREATE ACCESS";
