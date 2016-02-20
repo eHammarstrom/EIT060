@@ -9,32 +9,54 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.mysql.jdbc.Statement;
+
 public class Database {
 
 	private static Connection conn;
 	private ArrayList<User> users;
 	private ArrayList<Record> records;
+    private static String db_url;
+    private static String db_class;
+    private static String db_name;
+    private static String db_password;
 
-	public Database() {
-		conn = null;
-	}
+    private Database() {
+    	db_class = "com.mysql.jdbc.Driver";
+    	db_url = "jdbc:mysql://puccini.cs.lth.se/";
+    	db_name = "db142";
+    	db_password = "classic"; 
+    	conn = setConnection();
+    }
+    
+    private static Connection setConnection() {
+        try {
+        	try {
+				Class.forName(db_class);
+			} catch (ClassNotFoundException e) {
+				e.printStackTrace();
+			}
+        	
+        	java.sql.Connection conn = DriverManager.getConnection(db_url + db_name, db_name, db_password);
+            return conn;
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+        return null;
+    }
+    
+    private static class DatabaseHolder {
+        private final static Database instance = new Database();
+    }
+    
+    public static Database getInstance() {
+        try {
+            return DatabaseHolder.instance;
+        } catch (ExceptionInInitializerError ex) {
 
-	public boolean openConnection() {
-		try {
-			Class.forName("com.mysql.jdbc.Driver");
-			conn = DriverManager.getConnection("jdbc:mysql://puccini.cs.lth.se/" + "db142", "db142", "classic");
-		} catch (SQLException e) {
-			e.printStackTrace();
-			return false;
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		System.out.println("Connected");
-
-		return true;
-	}
+        }
+        return null;
+    }
 
 	public void closeConnection() {
 		try {
@@ -187,7 +209,7 @@ public class Database {
 		PreparedStatement statement = null;
 		try {
 			String sql = "INSERT INTO users2(username, password, division, permissionLevel, certNbr) VALUES(?,?,?,?,?)";
-			statement = conn.prepareStatement(sql);
+			statement = ((Connection) conn).prepareStatement(sql);
 			statement.setString(1, u.getUsername());
 			statement.setString(2, u.getPassword());
 			statement.setString(3, u.getDivision());
@@ -212,7 +234,7 @@ public class Database {
 		PreparedStatement statement = null;
 		try {
 			String sql = "INSERT INTO records(doctor, nurse, patient, division, medicalData, id) VALUES(?,?,?,?,?,?)";
-			statement = conn.prepareStatement(sql);
+			statement = ((Connection) conn).prepareStatement(sql);
 			statement.setLong(1, r.getDoctorCertNbr());
 			statement.setLong(2, r.getNurseCertNbr());
 			statement.setLong(3, r.getPatientCertNbr());
@@ -231,6 +253,10 @@ public class Database {
 				e.printStackTrace();
 			}
 		}
+	}
+	
+	public void writeRecord(long id) {
+		
 	}
 	
 	public void loadTestData() {
