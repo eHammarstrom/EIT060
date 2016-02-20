@@ -28,6 +28,7 @@ import utilities.Doctor;
 import utilities.Log;
 import utilities.Nurse;
 import utilities.Patient;
+import utilities.PermissionLevel;
 import utilities.User;
 import utilities.Record;
 
@@ -61,7 +62,7 @@ public class server implements Runnable {
 			PrintWriter printWriter = new PrintWriter(socket.getOutputStream());
 			
 			Database db = Database.getInstance();
-
+			
 			users = db.getUsers();
 			records = db.getRecords();
 			
@@ -99,7 +100,11 @@ public class server implements Runnable {
 
 						ArrayList<Record> userRecords = new ArrayList<Record>();
 
-						for (Record r : records) {
+						for (Record r : records) {	
+							if(loggedInUser.getPermissions().equals(PermissionLevel.Agency)) {
+								userRecords.add(r);
+							}
+							
 							if (login.isAssociated(r)) {
 								userRecords.add(r);
 							}

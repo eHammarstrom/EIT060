@@ -209,7 +209,7 @@ public class Database {
 		PreparedStatement statement = null;
 		try {
 			String sql = "INSERT INTO users2(username, password, division, permissionLevel, certNbr) VALUES(?,?,?,?,?)";
-			statement = ((Connection) conn).prepareStatement(sql);
+			statement = conn.prepareStatement(sql);
 			statement.setString(1, u.getUsername());
 			statement.setString(2, u.getPassword());
 			statement.setString(3, u.getDivision());
@@ -234,7 +234,7 @@ public class Database {
 		PreparedStatement statement = null;
 		try {
 			String sql = "INSERT INTO records(doctor, nurse, patient, division, medicalData, id) VALUES(?,?,?,?,?,?)";
-			statement = ((Connection) conn).prepareStatement(sql);
+			statement = conn.prepareStatement(sql);
 			statement.setLong(1, r.getDoctorCertNbr());
 			statement.setLong(2, r.getNurseCertNbr());
 			statement.setLong(3, r.getPatientCertNbr());
@@ -255,9 +255,51 @@ public class Database {
 		}
 	}
 	
-	public void writeRecord(long id) {
-		
+	public void writeRecord(String medicalData, long id) {
+		PreparedStatement statement = null;
+		try {
+			String sql = "UPDATE records SET medicalData = ? WHERE id = ?";
+			statement = conn.prepareStatement(sql);
+			statement.setString(1, medicalData);
+			statement.setLong(2, id);
+			statement.executeUpdate();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				statement.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
 	}
+	
+	public void deleteRecord(long id) {
+		PreparedStatement statement = null;
+		try {
+			String sql = "DELETE FROM records WHERE id = ?";
+			statement = conn.prepareStatement(sql);
+			statement.setLong(1, id);
+			statement.executeUpdate();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				statement.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+	
+	public void updateRecords() {
+		getRecords();
+	}
+	
+	public void updateUsers() {
+		getUsers();
+	}
+	
 	
 	public void loadTestData() {
 		Doctor doc_1 = new Doctor("doctor", "password", User.DIV_EMERGENCY, 1, false);
