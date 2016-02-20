@@ -57,21 +57,41 @@ public class Database {
 			String sql = "SELECT doctor, nurse, patient, division, medicalData, id FROM records";
 			statement = conn.prepareStatement(sql);
 			ResultSet result = statement.executeQuery();
+			
+			records = new ArrayList<Record>();
 
 			while (result.next()) {
-
-				Doctor doctor = (Doctor) getUser(result.getLong("doctor"));
-				Nurse nurse = (Nurse) getUser(result.getLong("nurse"));
-				Patient patient = (Patient) getUser(result.getLong("patient"));
+				
+				long doctorCertNbr = result.getLong("doctor");
+				long nurseCertNbr = result.getLong("nurse");
+				long patientCertNbr = result.getLong("patient");
 				String division = result.getString("division");
 				String medicalData = result.getString("medicalData");
 				long id = result.getLong("id");
-
-				Record r = new Record(doctor, nurse, patient, division, medicalData, id);
-
-				if (r != null) {
-					records.add(r);
+				
+				Doctor doctor = null;
+				Nurse nurse = null;
+				Patient patient = null;
+		
+				for(User u : users) {
+					if(u.getCertNbr() == doctorCertNbr) {
+						doctor = (Doctor) u;
+					} else if(u.getCertNbr() == nurseCertNbr) {
+						nurse = (Nurse) u;
+					} else if(u.getCertNbr() == patientCertNbr) {
+						patient = (Patient) u;
+					}
 				}
+				
+				Record r = null;
+				
+				if(doctor != null && nurse != null && patient != null) {
+					r = new Record(doctor, nurse, patient, division, medicalData, id);
+				} else {
+					System.out.println("NULL FAILURE!");
+				}
+				
+				records.add(r);
 			}
 
 			return records;
@@ -114,7 +134,7 @@ public class Database {
 			String sql = "SELECT username, password, division, certNbr, permissionLevel, certNbr FROM users2";
 			statement = conn.prepareStatement(sql);
 			ResultSet result = statement.executeQuery();
-			
+	
 			users = new ArrayList<User>();
 
 			while (result.next()) {
@@ -127,19 +147,19 @@ public class Database {
 
 				User u = null;
 
-				if (permLevel.equals("agency")) {
+				if (permLevel.equalsIgnoreCase("agency")) {
 					u = new Agency(username, password, division, certNbr, true);
 				}
 
-				if (permLevel.equals("doctor")) {
+				if (permLevel.equalsIgnoreCase("doctor")) {
 					u = new Doctor(username, password, division, certNbr, true);
 				}
 
-				if (permLevel.equals("nurse")) {
+				if (permLevel.equalsIgnoreCase("nurse")) {
 					u = new Nurse(username, password, division, certNbr, true);
 				}
 
-				if (permLevel.equals("patient")) {
+				if (permLevel.equalsIgnoreCase("patient")) {
 					u = new Patient(username, password, division, certNbr, true);
 				}
 

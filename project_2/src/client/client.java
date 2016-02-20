@@ -125,10 +125,12 @@ public class client {
 				return;
 			}
 			
+			boolean accessDenied = false;
+			
 			while (!isDone) {
-				boolean accessDenied = false;
 				if (accessDenied) {
-					System.out.println("Access denied.");
+					System.out.println("Access denied, or no such record exists!");
+					printHelp();
 				} else {
 					printHelp();
 				}
@@ -141,22 +143,28 @@ public class client {
 					break;
 				} else if (splitMsg[0].equalsIgnoreCase("records")) {
 					printRecords();
+					accessDenied = false;
 				} else if (splitMsg[0].equalsIgnoreCase("edit") 
 						&& recordExists(splitMsg[1]) 
 						&& (accessDenied = hasPermissions(msg))) {
 					editRecord(splitMsg[1]);
+					accessDenied = false;
 				} else if (splitMsg[0].equalsIgnoreCase("read") 
 						&& recordExists(splitMsg[1]) 
 						&& (accessDenied = hasPermissions(msg))) {
 					printRecord(splitMsg[1]);
+					accessDenied = false;
 				} else if (splitMsg[0].equalsIgnoreCase("delete")
 						&& recordExists(splitMsg[1]) 
 						&& (accessDenied = hasPermissions(msg))) {
 					for (Record r : records) {
 						if (r.getId() == Long.parseLong(splitMsg[1])) {
 							r.delete(user);
+							accessDenied = false;
 						}
 					}
+				} else {
+					accessDenied = true;
 				}
 			}
 
