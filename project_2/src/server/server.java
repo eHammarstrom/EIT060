@@ -59,12 +59,8 @@ public class server implements Runnable {
 			BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 			ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());
 			PrintWriter printWriter = new PrintWriter(socket.getOutputStream());
-	//		users = DBFileHandler.loadUsers();
-	//		records = DBFileHandler.loadRecords();
 			
-			Database db = new Database();
-			db.openConnection();
-	//		db.loadTestData();
+			Database db = Database.getInstance();
 
 			users = db.getUsers();
 			records = db.getRecords();
