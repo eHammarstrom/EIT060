@@ -36,8 +36,6 @@ public class server implements Runnable {
 	private static int numConnectedClients = 0;
 	private ArrayList<User> users;
 	private ArrayList<Record> records;
-	private ArrayList<User> users2;
-	private ArrayList<Record> records2;
 
 	public server(ServerSocket ss) throws IOException {
 		serverSocket = ss;
