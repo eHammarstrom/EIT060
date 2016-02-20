@@ -80,9 +80,10 @@ public class Record implements Serializable {
 		return false;
 	}
 
-	public void write(String data) {
-		medicalData = data;
-		// here we need to write to the DB file, cause change.
+	public void write(String newData) {
+		medicalData = newData;
+		Database db = Database.getInstance();
+		db.writeRecord(newData, id);
 	}
 
 	public boolean delete(User user) {
@@ -94,6 +95,8 @@ public class Record implements Serializable {
 	}
 
 	public void delete() {
+		Database db = Database.getInstance();
+		db.deleteRecord(id);
 		// Here we must update doctor, nurse, and patient of their loss of
 		// record and then write this to the DB
 	}
