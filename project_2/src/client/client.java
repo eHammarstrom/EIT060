@@ -129,8 +129,7 @@ public class client {
 			
 			while (!isDone) {
 				if (accessDenied) {
-					System.out.println("Access denied, or no such record exists!");
-					printHelp();
+					System.out.println("Access denied, or no such record exists! \t Type 'help' for commands.");
 				}
 
 				System.out.print(user.getUsername() + " commands>");
@@ -139,6 +138,8 @@ public class client {
 
 				if (msg.equalsIgnoreCase("quit")) {
 					break;
+				} else if (msg.equalsIgnoreCase("help")) {
+					printHelp();
 				} else if (splitMsg[0].equalsIgnoreCase("records")) {
 					printRecords();
 					accessDenied = false;
@@ -146,6 +147,7 @@ public class client {
 						&& recordExists(splitMsg[1]) 
 						&& (accessDenied = hasPermissions(msg))) {
 					editRecord(splitMsg[1]);
+					fetchRecords();
 					accessDenied = false;
 				} else if (splitMsg[0].equalsIgnoreCase("read") 
 						&& recordExists(splitMsg[1]) 
@@ -166,12 +168,24 @@ public class client {
 				}
 			}
 
+			ois.close();
 			out.close();
 			read.close();
 			socket.close();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+	
+	private static void fetchRecords() throws ClassNotFoundException, IOException {
+		out.println("recordfetch");
+		out.flush();
+
+		records = (ArrayList<Record>) ois.readObject();	
+		
+		System.out.println("Printing fetched records: ");
+		for (Record r : records)
+			System.out.println(r.getId() + " " + r.getMedicalData());
 	}
 
 	private static boolean hasPermissions(String msg) throws IOException {
@@ -208,9 +222,10 @@ public class client {
 		}
 
 		while (!isDone) {
-			System.out.print(record.getMedicalData());
+			System.out.println("OLD: " + record.getMedicalData());
+			System.out.print("NEW: ");
 			msg = read.readLine();
-			System.out.println("Done editing or start over? <yes>/<no>/<cancel>");
+			System.out.println("Save change? <yes>/<no>");
 			String ans = read.readLine();
 
 			if (ans.equalsIgnoreCase("yes")) {

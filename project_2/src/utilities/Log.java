@@ -9,6 +9,7 @@ public class Log {
 	public static final String CREATE = "CREATE";
 	public static final String READ = "READ";
 	public static final String DELETE = "DELETE";
+	public static final String RETR_RECORDS = "RETRIEVED RECORDS";
 
 	private static final String LOG_NAME = "action_log";
 	private static PrintWriter printWriter;

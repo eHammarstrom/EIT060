@@ -60,12 +60,12 @@ public class server implements Runnable {
 			BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 			ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());
 			PrintWriter printWriter = new PrintWriter(socket.getOutputStream());
-			
+
 			Database db = Database.getInstance();
-			
+
 			users = db.getUsers();
 			records = db.getRecords();
-			
+
 			for (Record r : records) {
 				System.out.println(r.getDoctorCertNbr());
 				System.out.println(r.getNurseCertNbr());
@@ -74,18 +74,18 @@ public class server implements Runnable {
 				System.out.println(r.getMedicalData());
 				System.out.println("");
 			}
-			
+
 			for (User u : users) {
 				System.out.println(u.toString());
 			}
-			
 
 			if (true) {
 
 				String clientMsg = null;
 				User loggedInUser = null;
+				boolean isLogin = false;
 
-				while (loggedInUser == null) {
+				while (!isLogin) {
 					clientMsg = in.readLine();
 					String[] splitMsg = clientMsg.split("\\s+");
 					User login = null;
@@ -94,14 +94,14 @@ public class server implements Runnable {
 
 						for (User u : users) {
 							login = u.login(splitMsg[1], splitMsg[2], cert.getSerialNumber().toString());
-//							login = u.login(splitMsg[1], splitMsg[2], 1);
 							loggedInUser = u;
 							if (login != null) {
+								isLogin = true;
 								break;
 							}
 						}
 
-						oos.writeObject(loggedInUser);
+						oos.writeObject(login);
 						oos.flush();
 					}
 
@@ -112,16 +112,7 @@ public class server implements Runnable {
 
 					if (login != null && !records.isEmpty()) {
 
-						ArrayList<Record> userRecords = new ArrayList<Record>();
-
-						for (Record r : records) {	
-							if (login.isAssociated(r)) {
-								System.out.println("FOUND ASSOCIATED RECORD");
-								userRecords.add(r);
-							} else if(loggedInUser.getPermissions().equals(PermissionLevel.Agency)) {
-								userRecords.add(r);
-							} 
-						}
+						ArrayList<Record> userRecords = getUserRecords(login);
 
 						oos.writeObject(userRecords);
 						oos.flush();
@@ -137,32 +128,43 @@ public class server implements Runnable {
 						System.out.println(s);
 					}
 
+					boolean recordAccess = true;
 					Record rec = null;
 
-					for (Record r : records) {
-						System.out.println(r.getId());
-						if (Long.parseLong(commandSplit[1]) == r.getId()) {
-							System.out.println("FOUND RECORD");
-							rec = r;
+					if (commandSplit[0].equalsIgnoreCase("recordfetch")) {
+						System.out.println("RECORD FETCH RECEIVED.");
+						Log.append(loggedInUser.toString(), Log.RETR_RECORDS);
+
+						ArrayList<Record> userRecords = getUserRecords(loggedInUser);
+						
+						for (Record r : userRecords) {
+							System.out.println(r.getId() + " " + r.getMedicalData());
+						}
+
+						oos.writeObject(userRecords);
+						oos.flush();
+					} else {
+						for (Record r : records) {
+							System.out.println(r.getId());
+							if (Long.parseLong(commandSplit[1]) == r.getId()) {
+								System.out.println("FOUND RECORD");
+								rec = r;
+								break;
+							}
+						}
+
+						if (rec == null) {
+							System.out.println("RECORD DOES NOT EXIST!");
 							break;
 						}
 					}
-
-					if (rec == null) {
-						System.out.println("RECORD DOES NOT EXIST!");
-						break;
-					}
-
-					boolean recordAccess = true;
 
 					if (commandSplit[0].equalsIgnoreCase("read")) {
 						Log.append(loggedInUser.toString(), Log.READ);
 
 						recordAccess = loggedInUser.readRecord(rec);
 						returnAccess(recordAccess, printWriter);
-					}
-
-					if (commandSplit[0].equalsIgnoreCase("edit")) {
+					} else if (commandSplit[0].equalsIgnoreCase("edit")) {
 						Log.append(loggedInUser.toString(), Log.EDIT);
 
 						recordAccess = loggedInUser.writeRecord(rec);
@@ -171,9 +173,7 @@ public class server implements Runnable {
 						if (recordAccess) {
 							rec.write(in.readLine());
 						}
-					}
-
-					if (commandSplit[0].equalsIgnoreCase("create")) {
+					} else if (commandSplit[0].equalsIgnoreCase("create")) {
 						Log.append(loggedInUser.toString(), Log.CREATE);
 
 						recordAccess = loggedInUser.createRecord();
@@ -182,9 +182,7 @@ public class server implements Runnable {
 						if (recordAccess) {
 							String[] recordData = in.readLine().split("\\s+");
 						}
-					}
-
-					if (commandSplit[0].equalsIgnoreCase("delete")) {
+					} else if (commandSplit[0].equalsIgnoreCase("delete")) {
 						Log.append(loggedInUser.toString(), Log.DELETE);
 
 						recordAccess = loggedInUser.deleteRecord(rec);
@@ -215,6 +213,24 @@ public class server implements Runnable {
 			return;
 		}
 
+	}
+
+	private ArrayList<Record> getUserRecords(User login) {
+		if (login == null)
+			System.err.println("LOGIN WAS NULL> getUserRecords(login)");
+
+		ArrayList<Record> userRecords = new ArrayList<Record>();
+
+		for (Record r : records) {
+			if (login.isAssociated(r)) {
+				System.out.println("FOUND ASSOCIATED RECORD");
+				userRecords.add(r);
+			} else if (login.getPermissions().equals(PermissionLevel.Agency)) {
+				userRecords.add(r);
+			}
+		}
+
+		return userRecords;
 	}
 
 	private void returnAccess(boolean ans, PrintWriter printWriter) {
