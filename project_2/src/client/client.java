@@ -250,7 +250,7 @@ public class client {
 		boolean isDone = false;
 
 		while (!isDone) {
-			System.out.println("CREATE: ");
+			System.out.println("CREATE as <doctorName> <nurseName> <patientName> <division> <medicalData>: ");
 			msg = read.readLine();
 			System.out.println("Save created record? <yes>/<no>");
 			String ans = read.readLine();
@@ -269,6 +269,7 @@ public class client {
 		System.out.println("read <record nbr>");
 		System.out.println("edit <record nbr>");
 		System.out.println("delete <record nbr>");
+		System.out.println("create");
 	}
 
 	private static void printRecords() {

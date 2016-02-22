@@ -20,8 +20,8 @@ public class UserRecordCreation {
 		Patient patient_1 = new Patient("patient", "password", User.DIV_REHAB, "4", false);
 		Agency agency_1 = new Agency("Agency", "password", User.DIV_REHAB, "5", false);
 
-		Record r = new Record(doc_1, nurse_1, patient_1, User.DIV_REHAB, "Ont i benet", 10);
-		Record r2 = new Record(doc_1, nurse_1, patient_1, User.DIV_REHAB, "Ont i armen", 11);
+		Record r = new Record(doc_1, nurse_1, patient_1, User.DIV_REHAB, "Ont i benet");
+		Record r2 = new Record(doc_1, nurse_1, patient_1, User.DIV_REHAB, "Ont i armen");
 
 		// System.out.println(doc_1.toString());
 		// System.out.println(nurse_1.toString());

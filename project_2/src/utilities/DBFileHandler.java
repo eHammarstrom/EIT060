@@ -136,7 +136,7 @@ public class DBFileHandler {
 				Nurse n = (Nurse) getUserWithCertNbr(nurse);
 				Patient p = (Patient) getUserWithCertNbr(patient);
 
-				Record r = new Record(d, n, p, division, medicalData, id);
+				Record r = new Record(d, n, p, division, medicalData);
 
 				records.add(r);
 			}
