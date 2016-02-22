@@ -124,9 +124,9 @@ public class client {
 
 				return;
 			}
-			
+
 			boolean accessDenied = false;
-			
+
 			while (!isDone) {
 				if (accessDenied) {
 					System.out.println("Access denied, or no such record exists! \t Type 'help' for commands.");
@@ -143,19 +143,16 @@ public class client {
 				} else if (splitMsg[0].equalsIgnoreCase("records")) {
 					printRecords();
 					accessDenied = false;
-				} else if (splitMsg[0].equalsIgnoreCase("edit") 
-						&& recordExists(splitMsg[1]) 
+				} else if (splitMsg[0].equalsIgnoreCase("edit") && recordExists(splitMsg[1])
 						&& (accessDenied = hasPermissions(msg))) {
 					editRecord(splitMsg[1]);
 					fetchRecords();
 					accessDenied = false;
-				} else if (splitMsg[0].equalsIgnoreCase("read") 
-						&& recordExists(splitMsg[1]) 
+				} else if (splitMsg[0].equalsIgnoreCase("read") && recordExists(splitMsg[1])
 						&& (accessDenied = hasPermissions(msg))) {
 					printRecord(splitMsg[1]);
 					accessDenied = false;
-				} else if (splitMsg[0].equalsIgnoreCase("delete")
-						&& recordExists(splitMsg[1]) 
+				} else if (splitMsg[0].equalsIgnoreCase("delete") && recordExists(splitMsg[1])
 						&& (accessDenied = hasPermissions(msg))) {
 					for (Record r : records) {
 						if (r.getId() == Long.parseLong(splitMsg[1])) {
@@ -176,13 +173,13 @@ public class client {
 			e.printStackTrace();
 		}
 	}
-	
+
 	private static void fetchRecords() throws ClassNotFoundException, IOException {
 		out.println("recordfetch");
 		out.flush();
 
-		records = (ArrayList<Record>) ois.readObject();	
-		
+		records = (ArrayList<Record>) ois.readObject();
+
 		System.out.println("Printing fetched records: ");
 		for (Record r : records)
 			System.out.println(r.getId() + " " + r.getMedicalData());
@@ -265,15 +262,6 @@ public class client {
 			System.out.println(user.toString());
 
 			records = (ArrayList<Record>) ois.readObject();
-
-			// for (;;) {
-			// try {
-			// records.add((Record) ois.readObject());
-			// } catch (Exception e) {
-			// ois.close();
-			// break;
-			// }
-			// }
 
 		} else {
 			return false;

@@ -84,6 +84,7 @@ public class Record implements Serializable {
 		medicalData = newData;
 		Database db = Database.getInstance();
 		db.writeRecord(newData, id);
+		db.updateRecords();
 	}
 
 	public boolean delete(User user) {
@@ -97,6 +98,7 @@ public class Record implements Serializable {
 	public void delete() {
 		Database db = Database.getInstance();
 		db.deleteRecord(id);
+		db.updateRecords();
 		// Here we must update doctor, nurse, and patient of their loss of
 		// record and then write this to the DB
 	}

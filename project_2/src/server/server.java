@@ -63,6 +63,8 @@ public class server implements Runnable {
 
 			Database db = Database.getInstance();
 
+		//	db.loadTestData();
+			
 			users = db.getUsers();
 			records = db.getRecords();
 
@@ -93,6 +95,7 @@ public class server implements Runnable {
 					if (splitMsg[0].equalsIgnoreCase("login") && splitMsg.length == 3) {
 
 						for (User u : users) {
+							System.out.println(cert.getSerialNumber().toString());
 							login = u.login(splitMsg[1], splitMsg[2], cert.getSerialNumber().toString());
 							loggedInUser = u;
 							if (login != null) {
@@ -173,6 +176,9 @@ public class server implements Runnable {
 						if (recordAccess) {
 							rec.write(in.readLine());
 						}
+						
+						records = db.getRecords();
+						
 					} else if (commandSplit[0].equalsIgnoreCase("create")) {
 						Log.append(loggedInUser.toString(), Log.CREATE);
 
@@ -181,7 +187,11 @@ public class server implements Runnable {
 
 						if (recordAccess) {
 							String[] recordData = in.readLine().split("\\s+");
+							// Not done yet, but soon
 						}
+						
+						records = db.getRecords();
+						
 					} else if (commandSplit[0].equalsIgnoreCase("delete")) {
 						Log.append(loggedInUser.toString(), Log.DELETE);
 
@@ -191,6 +201,8 @@ public class server implements Runnable {
 						if (recordAccess) {
 							rec.delete();
 						}
+						
+						records = db.getRecords();
 					}
 				}
 
