@@ -165,7 +165,14 @@ public class client {
 							accessDenied = false;
 						}
 					}
-				} else {
+				} else if (splitMsg[0].equalsIgnoreCase("create") && (accessDenied = hasPermissions(msg))) {
+					createRecord();
+					accessDenied = false;
+				}
+				
+				
+				
+				else {
 					accessDenied = true;
 				}
 			}
@@ -238,12 +245,31 @@ public class client {
 			}
 		}
 	}
+	
+	private static void createRecord() throws IOException {
+		boolean isDone = false;
+
+		while (!isDone) {
+			System.out.println("CREATE as <doctorName> <nurseName> <patientName> <division> <medicalData>: ");
+			msg = read.readLine();
+			System.out.println("Save created record? <yes>/<no>");
+			String ans = read.readLine();
+
+			if (ans.equalsIgnoreCase("yes")) {
+				out.println(msg);
+				out.flush();
+				isDone = true;
+				System.out.println("Successfully created record.");
+			}
+		}
+	}
 
 	private static void printHelp() {
 		System.out.println("records - This retrieves a list of available records.");
 		System.out.println("read <record nbr>");
 		System.out.println("edit <record nbr>");
 		System.out.println("delete <record nbr>");
+		System.out.println("create");
 	}
 
 	private static void printRecords() {

@@ -123,7 +123,8 @@ public class Database {
 				Record r = null;
 
 				if (doctor != null && nurse != null && patient != null) {
-					r = new Record(doctor, nurse, patient, division, medicalData, id);
+					r = new Record(doctor, nurse, patient, division, medicalData);
+					r.setRecordId(id);
 				} else {
 					System.out.println("NULL FAILURE!");
 				}
@@ -158,6 +159,15 @@ public class Database {
 	private User getUser(String certNbr) {
 		for (User u : users) {
 			if (u.getCertNbr().equals(certNbr)) {
+				return u;
+			}
+		}
+		return null;
+	}
+	
+	public User getUserFromName(String username) {
+		for(User u : users) {
+			if(u.getUsername().equals(username)) {
 				return u;
 			}
 		}
@@ -251,14 +261,13 @@ public class Database {
 
 		PreparedStatement statement = null;
 		try {
-			String sql = "INSERT INTO records(doctor, nurse, patient, division, medicalData, id) VALUES(?,?,?,?,?,?)";
+			String sql = "INSERT INTO records(doctor, nurse, patient, division, medicalData) VALUES(?,?,?,?,?)";
 			statement = conn.prepareStatement(sql);
 			statement.setString(1, r.getDoctorCertNbr());
 			statement.setString(2, r.getNurseCertNbr());
 			statement.setString(3, r.getPatientCertNbr());
 			statement.setString(4, r.getDivision());
 			statement.setString(5, r.getMedicalData());
-			statement.setLong(6, r.getId());
 			statement.executeUpdate();
 
 		} catch (SQLException e) {
@@ -325,10 +334,10 @@ public class Database {
 		Patient patient_2 = new Patient("patient2", "password", User.DIV_REHAB, "5", false);
 		Agency agency_1 = new Agency("agency", "password", User.DIV_REHAB, "6", false);
 
-		Record r = new Record(doc_1, nurse_1, patient_1, User.DIV_REHAB, "Ont i benet", 10);
-		Record r2 = new Record(doc_1, nurse_1, patient_1, User.DIV_REHAB, "Ont i armen", 11);
-		Record r3 = new Record(doc_1, nurse_2, patient_2, User.DIV_EMERGENCY, "Ont i huvudet", 12);
-		Record r4 = new Record(doc_1, nurse_2, patient_2, User.DIV_EMERGENCY, "Ont i örat", 13);
+		Record r = new Record(doc_1, nurse_1, patient_1, User.DIV_REHAB, "Ont i benet");
+		Record r2 = new Record(doc_1, nurse_1, patient_1, User.DIV_REHAB, "Ont i armen");
+		Record r3 = new Record(doc_1, nurse_2, patient_2, User.DIV_EMERGENCY, "Ont i huvudet");
+		Record r4 = new Record(doc_1, nurse_2, patient_2, User.DIV_EMERGENCY, "Ont i örat");
 
 		this.insertUser(doc_1);
 		this.insertUser(nurse_1);

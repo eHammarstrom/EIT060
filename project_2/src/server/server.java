@@ -63,8 +63,8 @@ public class server implements Runnable {
 
 			Database db = Database.getInstance();
 
-		//	db.loadTestData();
-			
+			// db.loadTestData();
+
 			users = db.getUsers();
 			records = db.getRecords();
 
@@ -139,13 +139,40 @@ public class server implements Runnable {
 						Log.append(loggedInUser.toString(), Log.RETR_RECORDS);
 
 						ArrayList<Record> userRecords = getUserRecords(loggedInUser);
-						
+
 						for (Record r : userRecords) {
 							System.out.println(r.getId() + " " + r.getMedicalData());
 						}
 
 						oos.writeObject(userRecords);
 						oos.flush();
+					} else if (commandSplit[0].equalsIgnoreCase("create")) {
+						Log.append(loggedInUser.toString(), Log.CREATE);
+
+						recordAccess = loggedInUser.createRecord();
+						returnAccess(recordAccess, printWriter);
+
+						if (recordAccess) {
+							String[] recordData = in.readLine().split("\\s+");
+							String doctor = recordData[0];
+							String nurse = recordData[1];
+							String patient = recordData[2];
+							String division = recordData[3];
+							String medicalData = recordData[4];
+
+							Doctor d = (Doctor) db.getUserFromName(doctor);
+							Nurse n = (Nurse) db.getUserFromName(nurse);
+							Patient p = (Patient) db.getUserFromName(patient);
+							
+							if(d != null && n != null && p != null && division != null && medicalData != null) {
+								loggedInUser.createRecord(d, n, p, division, medicalData);
+							} else {
+								System.out.println("CANNOT CREATE RECORD -> NULL EXCEPTION");
+							}
+						}
+
+						records = db.getRecords();
+
 					} else {
 						for (Record r : records) {
 							System.out.println(r.getId());
@@ -176,22 +203,9 @@ public class server implements Runnable {
 						if (recordAccess) {
 							rec.write(in.readLine());
 						}
-						
-						records = db.getRecords();
-						
-					} else if (commandSplit[0].equalsIgnoreCase("create")) {
-						Log.append(loggedInUser.toString(), Log.CREATE);
 
-						recordAccess = loggedInUser.createRecord();
-						returnAccess(recordAccess, printWriter);
-
-						if (recordAccess) {
-							String[] recordData = in.readLine().split("\\s+");
-							// Not done yet, but soon
-						}
-						
 						records = db.getRecords();
-						
+
 					} else if (commandSplit[0].equalsIgnoreCase("delete")) {
 						Log.append(loggedInUser.toString(), Log.DELETE);
 
@@ -201,7 +215,7 @@ public class server implements Runnable {
 						if (recordAccess) {
 							rec.delete();
 						}
-						
+
 						records = db.getRecords();
 					}
 				}
