@@ -131,8 +131,6 @@ public class client {
 				if (accessDenied) {
 					System.out.println("Access denied, or no such record exists!");
 					printHelp();
-				} else {
-					printHelp();
 				}
 
 				System.out.print(user.getUsername() + " commands>");

@@ -14,11 +14,11 @@ public class UserRecordCreation {
 
 	public static void main(String[] args) {
 
-		Doctor doc_1 = new Doctor("doctor", "password", User.DIV_EMERGENCY, 1, false);
-		Nurse nurse_1 = new Nurse("nurse", "password", User.DIV_REHAB, 2, false);
-		Nurse nurse_2 = new Nurse("nurse2", "password", User.DIV_EMERGENCY, 3, false);
-		Patient patient_1 = new Patient("patient", "password", User.DIV_REHAB, 4, false);
-		Agency agency_1 = new Agency("Agency", "password", User.DIV_REHAB, 5, false);
+		Doctor doc_1 = new Doctor("doctor", "password", User.DIV_EMERGENCY, "1", false);
+		Nurse nurse_1 = new Nurse("nurse", "password", User.DIV_REHAB, "2", false);
+		Nurse nurse_2 = new Nurse("nurse2", "password", User.DIV_EMERGENCY, "3", false);
+		Patient patient_1 = new Patient("patient", "password", User.DIV_REHAB, "4", false);
+		Agency agency_1 = new Agency("Agency", "password", User.DIV_REHAB, "5", false);
 
 		Record r = new Record(doc_1, nurse_1, patient_1, User.DIV_REHAB, "Ont i benet", 10);
 		Record r2 = new Record(doc_1, nurse_1, patient_1, User.DIV_REHAB, "Ont i armen", 11);
@@ -40,7 +40,7 @@ public class UserRecordCreation {
 		
 		for(User u : users) {
 			System.out.println(u.getCertNbr());
-			User login = u.login("doctor", "password");
+			User login = u.login("doctor", "password", "1");
 
 			if (u.getUsername().equals("doctor"))
 				System.out.println(u.getPassword());

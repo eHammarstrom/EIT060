@@ -25,15 +25,15 @@ public class Record implements Serializable {
 		patient.addRecord(this);
 	}
 
-	public long getDoctorCertNbr() {
+	public String getDoctorCertNbr() {
 		return doctor.getCertNbr();
 	}
 
-	public long getNurseCertNbr() {
+	public String getNurseCertNbr() {
 		return nurse.getCertNbr();
 	}
 
-	public long getPatientCertNbr() {
+	public String getPatientCertNbr() {
 		return patient.getCertNbr();
 	}
 

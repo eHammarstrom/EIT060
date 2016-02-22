@@ -66,6 +66,19 @@ public class server implements Runnable {
 			users = db.getUsers();
 			records = db.getRecords();
 			
+			for (Record r : records) {
+				System.out.println(r.getDoctorCertNbr());
+				System.out.println(r.getNurseCertNbr());
+				System.out.println(r.getId());
+				System.out.println(r.getDivision());
+				System.out.println(r.getMedicalData());
+				System.out.println("");
+			}
+			
+			for (User u : users) {
+				System.out.println(u.toString());
+			}
+			
 
 			if (true) {
 
@@ -80,7 +93,8 @@ public class server implements Runnable {
 					if (splitMsg[0].equalsIgnoreCase("login") && splitMsg.length == 3) {
 
 						for (User u : users) {
-							login = u.login(splitMsg[1], splitMsg[2]);
+							login = u.login(splitMsg[1], splitMsg[2], cert.getSerialNumber().toString());
+//							login = u.login(splitMsg[1], splitMsg[2], 1);
 							loggedInUser = u;
 							if (login != null) {
 								break;
@@ -101,13 +115,12 @@ public class server implements Runnable {
 						ArrayList<Record> userRecords = new ArrayList<Record>();
 
 						for (Record r : records) {	
-							if(loggedInUser.getPermissions().equals(PermissionLevel.Agency)) {
-								userRecords.add(r);
-							}
-							
 							if (login.isAssociated(r)) {
+								System.out.println("FOUND ASSOCIATED RECORD");
 								userRecords.add(r);
-							}
+							} else if(loggedInUser.getPermissions().equals(PermissionLevel.Agency)) {
+								userRecords.add(r);
+							} 
 						}
 
 						oos.writeObject(userRecords);

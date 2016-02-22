@@ -31,7 +31,7 @@ public class DBFileHandler {
 				String username = (String) obj.get("Username");
 				String password = (String) obj.get("Password");
 				String division = (String) obj.get("Division");
-				long id = (long) obj.get("Id");
+				String id = (String) obj.get("Id");
 				String permLevel = (String) obj.get("Permission level");
 
 				User u = null;
@@ -104,9 +104,9 @@ public class DBFileHandler {
 
 	}
 
-	private static User getUserWithCertNbr(long id) {
+	private static User getUserWithCertNbr(String id) {
 		for (User u : users) {
-			if (u.getCertNbr() == id) {
+			if (u.getCertNbr().equals(id)) {
 				return u;
 			}
 		}
@@ -125,9 +125,9 @@ public class DBFileHandler {
 
 				JSONObject obj = (JSONObject) new JSONParser().parse(scan.nextLine());
 
-				Long doctor = (Long) obj.get("Doctor");
-				Long nurse = (Long) obj.get("Nurse");
-				Long patient = (Long) obj.get("Patient");
+				String doctor = (String) obj.get("Doctor");
+				String nurse = (String) obj.get("Nurse");
+				String patient = (String) obj.get("Patient");
 				String division = (String) obj.get("Division");
 				String medicalData = (String) obj.get("Medical data");
 				long id = (long) obj.get("Id");

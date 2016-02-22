@@ -84,9 +84,9 @@ public class Database {
 
 			while (result.next()) {
 				
-				long doctorCertNbr = result.getLong("doctor");
-				long nurseCertNbr = result.getLong("nurse");
-				long patientCertNbr = result.getLong("patient");
+				String doctorCertNbr = result.getString("doctor");
+				String nurseCertNbr = result.getString("nurse");
+				String patientCertNbr = result.getString("patient");
 				String division = result.getString("division");
 				String medicalData = result.getString("medicalData");
 				long id = result.getLong("id");
@@ -96,11 +96,11 @@ public class Database {
 				Patient patient = null;
 		
 				for(User u : users) {
-					if(u.getCertNbr() == doctorCertNbr) {
+					if(u.getCertNbr().equals(doctorCertNbr)) {
 						doctor = (Doctor) u;
-					} else if(u.getCertNbr() == nurseCertNbr) {
+					} else if(u.getCertNbr().equals(nurseCertNbr)) {
 						nurse = (Nurse) u;
-					} else if(u.getCertNbr() == patientCertNbr) {
+					} else if(u.getCertNbr().equals(patientCertNbr)) {
 						patient = (Patient) u;
 					}
 				}
@@ -140,9 +140,9 @@ public class Database {
 		return null;
 	}
 
-	private User getUser(long certNbr) {
+	private User getUser(String certNbr) {
 		for (User u : users) {
-			if (u.getCertNbr() == certNbr) {
+			if (u.getCertNbr().equals(certNbr)) {
 				return u;
 			}
 		}
@@ -165,24 +165,28 @@ public class Database {
 				String username = result.getString("username");
 				String password = result.getString("password");
 				String division = result.getString("division");
-				long certNbr = result.getLong("certNbr");
+				String certNbr = result.getString("certNbr");
 
 				User u = null;
 
 				if (permLevel.equalsIgnoreCase("agency")) {
 					u = new Agency(username, password, division, certNbr, true);
+					System.out.println("CREATED AGENCY: " + u.toString());
 				}
 
 				if (permLevel.equalsIgnoreCase("doctor")) {
 					u = new Doctor(username, password, division, certNbr, true);
+					System.out.println("CREATED DOCTOR: " + u.toString());
 				}
 
 				if (permLevel.equalsIgnoreCase("nurse")) {
 					u = new Nurse(username, password, division, certNbr, true);
+					System.out.println("CREATED NURSE: " + u.toString());
 				}
 
 				if (permLevel.equalsIgnoreCase("patient")) {
 					u = new Patient(username, password, division, certNbr, true);
+					System.out.println("CREATED PATIENT: " + u.toString());
 				}
 
 				if (u != null) {
@@ -214,7 +218,7 @@ public class Database {
 			statement.setString(2, u.getPassword());
 			statement.setString(3, u.getDivision());
 			statement.setString(4, u.getPermissions().toString());
-			statement.setLong(5, u.getCertNbr());
+			statement.setString(5, u.getCertNbr());
 			statement.executeUpdate();
 			
 			
@@ -235,9 +239,9 @@ public class Database {
 		try {
 			String sql = "INSERT INTO records(doctor, nurse, patient, division, medicalData, id) VALUES(?,?,?,?,?,?)";
 			statement = conn.prepareStatement(sql);
-			statement.setLong(1, r.getDoctorCertNbr());
-			statement.setLong(2, r.getNurseCertNbr());
-			statement.setLong(3, r.getPatientCertNbr());
+			statement.setString(1, r.getDoctorCertNbr());
+			statement.setString(2, r.getNurseCertNbr());
+			statement.setString(3, r.getPatientCertNbr());
 			statement.setString(4, r.getDivision());
 			statement.setString(5, r.getMedicalData());
 			statement.setLong(6, r.getId());
@@ -302,11 +306,11 @@ public class Database {
 	
 	
 	public void loadTestData() {
-		Doctor doc_1 = new Doctor("doctor", "password", User.DIV_EMERGENCY, 1, false);
-		Nurse nurse_1 = new Nurse("nurse", "password", User.DIV_REHAB, 2, false);
-		Nurse nurse_2 = new Nurse("nurse2", "password", User.DIV_EMERGENCY, 3, false);
-		Patient patient_1 = new Patient("patient", "password", User.DIV_REHAB, 4, false);
-		Agency agency_1 = new Agency("Agency", "password", User.DIV_REHAB, 5, false);
+		Doctor doc_1 = new Doctor("doctor", "password", User.DIV_EMERGENCY, "1", false);
+		Nurse nurse_1 = new Nurse("nurse", "password", User.DIV_REHAB, "2", false);
+		Nurse nurse_2 = new Nurse("nurse2", "password", User.DIV_EMERGENCY, "3", false);
+		Patient patient_1 = new Patient("patient", "password", User.DIV_REHAB, "4", false);
+		Agency agency_1 = new Agency("Agency", "password", User.DIV_REHAB, "5", false);
 
 		Record r = new Record(doc_1, nurse_1, patient_1, User.DIV_REHAB, "Ont i benet", 10);
 		Record r2 = new Record(doc_1, nurse_1, patient_1, User.DIV_REHAB, "Ont i armen", 11);

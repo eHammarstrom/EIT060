@@ -12,11 +12,11 @@ public abstract class User implements Serializable {
 	private String username;
 	private String password;
 	private String division;
-	private long certNbr;
+	private String certNbr;
 	protected PermissionLevel permLevel;
 	private ArrayList<Record> records;
 	
-	public User(String username, String password, String division, long certNbr, boolean readMode) {
+	public User(String username, String password, String division, String certNbr, boolean readMode) {
 		this.username = username;
 
 		if (readMode)
@@ -37,7 +37,7 @@ public abstract class User implements Serializable {
 		return username;
 	}
 	
-	public long getCertNbr() {
+	public String getCertNbr() {
 		return certNbr;
 	}
 	
@@ -83,8 +83,8 @@ public abstract class User implements Serializable {
 		records.add(r);
 	}
 	
-	public User login(String recvUsername, String recvPassword) {
-		if (recvUsername.equals(username) && BCrypt.checkpw(recvPassword, password)) {
+	public User login(String recvUsername, String recvPassword, String recvCertNbr) {
+		if (recvUsername.equals(username) && BCrypt.checkpw(recvPassword, password) && recvCertNbr.equals(certNbr)) {
 			return this;
 		} else {
 			return null;
