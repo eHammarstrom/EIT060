@@ -165,7 +165,14 @@ public class client {
 							accessDenied = false;
 						}
 					}
-				} else {
+				} else if (splitMsg[0].equalsIgnoreCase("create") && (accessDenied = hasPermissions(msg))) {
+					createRecord();
+					accessDenied = false;
+				}
+				
+				
+				
+				else {
 					accessDenied = true;
 				}
 			}
@@ -235,6 +242,24 @@ public class client {
 				out.flush();
 				isDone = true;
 				System.out.println("Successfully edited record.");
+			}
+		}
+	}
+	
+	private static void createRecord() throws IOException {
+		boolean isDone = false;
+
+		while (!isDone) {
+			System.out.println("CREATE: ");
+			msg = read.readLine();
+			System.out.println("Save created record? <yes>/<no>");
+			String ans = read.readLine();
+
+			if (ans.equalsIgnoreCase("yes")) {
+				out.println(msg);
+				out.flush();
+				isDone = true;
+				System.out.println("Successfully created record.");
 			}
 		}
 	}

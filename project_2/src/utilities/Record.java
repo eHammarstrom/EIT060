@@ -11,18 +11,20 @@ public class Record implements Serializable {
 	private String medicalData;
 	private long id;
 
-	public Record(Doctor doctor, Nurse nurse, Patient patient, String division, String medicalData, long id) {
+	public Record(Doctor doctor, Nurse nurse, Patient patient, String division, String medicalData) {
 		this.doctor = doctor;
 		this.nurse = nurse;
 		this.patient = patient;
 		this.division = division;
 		this.medicalData = medicalData;
-		this.id = id; // This should be setup to be auto incremented when added
-						// to the DB.
 
 		doctor.addRecord(this);
 		nurse.addRecord(this);
 		patient.addRecord(this);
+	}
+	
+	public void setRecordId(long id) {
+		this.id = id;
 	}
 
 	public String getDoctorCertNbr() {
@@ -99,8 +101,5 @@ public class Record implements Serializable {
 		Database db = Database.getInstance();
 		db.deleteRecord(id);
 		db.updateRecords();
-		// Here we must update doctor, nurse, and patient of their loss of
-		// record and then write this to the DB
 	}
-
 }

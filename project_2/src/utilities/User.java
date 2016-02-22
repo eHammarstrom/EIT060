@@ -82,6 +82,16 @@ public abstract class User implements Serializable {
 	public void addRecord(Record r) {
 		records.add(r);
 	}
+	
+	public void createRecord(Doctor doctor, Nurse nurse, Patient patient, String divsion, String medicalData) {
+		
+		Record r = new Record(doctor, nurse, patient, division, medicalData);
+		Database db = Database.getInstance();
+		db.insertRecord(r);
+		db.updateRecords();
+		this.addRecord(r);
+		
+	}
 
 	public User login(String recvUsername, String recvPassword, String recvCertNbr) {
 		if (recvUsername.equals(username) && BCrypt.checkpw(recvPassword, password) && recvCertNbr.equals(certNbr)) {
