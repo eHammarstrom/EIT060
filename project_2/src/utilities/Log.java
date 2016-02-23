@@ -5,6 +5,8 @@ import java.io.PrintWriter;
 import java.util.Calendar;
 
 public class Log {
+	public static final String LOGIN_SUCCESS = "LOGIN SUCCESSFUL";
+	public static final String LOGIN_FAILED = "LOGIN FAILED";
 	public static final String EDIT = "EDIT";
 	public static final String CREATE = "CREATE";
 	public static final String READ = "READ";

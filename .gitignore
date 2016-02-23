@@ -1,1 +1,3 @@
-/project_2/bin/
+# compiled java code excluded
+*.class
+action_log

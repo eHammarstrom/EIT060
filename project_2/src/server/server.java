@@ -103,6 +103,12 @@ public class server implements Runnable {
 								break;
 							}
 						}
+						
+						if (isLogin)
+							Log.append(splitMsg[1] + " " + splitMsg[2], Log.LOGIN_SUCCESS);
+						else
+							Log.append(splitMsg[1] + " " + splitMsg[2], Log.LOGIN_FAILED);
+							
 
 						oos.writeObject(login);
 						oos.flush();
