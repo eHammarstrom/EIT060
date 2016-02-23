@@ -52,16 +52,25 @@ public class client {
 		try { /* set up a key manager for client authentication */
 			SSLSocketFactory factory = null;
 			try {
-				char[] password = "password".toCharArray();
+				// char[] password = "password".toCharArray();
 				KeyStore ks = KeyStore.getInstance("JKS");
 				KeyStore ts = KeyStore.getInstance("JKS");
 				KeyManagerFactory kmf = KeyManagerFactory.getInstance("SunX509");
 				TrustManagerFactory tmf = TrustManagerFactory.getInstance("SunX509");
 				SSLContext ctx = SSLContext.getInstance("TLS");
 
-				System.out.print("Enter keystore: ");
 				BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+
+				System.out.print("Enter keystore: ");
+				
 				String keystoreName = br.readLine();
+
+				System.out.print("\nEnter password: ");
+
+				String pwRead = br.readLine();
+				char[] password = pwRead.toCharArray();
+				
+				// Should be read invisibly
 
 				ks.load(new FileInputStream("keystores/" + keystoreName), password); // keystore
 																			// password
@@ -74,6 +83,7 @@ public class client {
 				ctx.init(kmf.getKeyManagers(), tmf.getTrustManagers(), null);
 				factory = ctx.getSocketFactory();
 			} catch (Exception e) {
+				e.printStackTrace();
 				throw new IOException(e.getMessage());
 			}
 			SSLSocket socket = (SSLSocket) factory.createSocket(host, port);

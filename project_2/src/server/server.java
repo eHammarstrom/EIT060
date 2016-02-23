@@ -63,23 +63,8 @@ public class server implements Runnable {
 
 			Database db = Database.getInstance();
 
-			// db.loadTestData();
-
 			users = db.getUsers();
 			records = db.getRecords();
-
-			for (Record r : records) {
-				System.out.println(r.getDoctorCertNbr());
-				System.out.println(r.getNurseCertNbr());
-				System.out.println(r.getId());
-				System.out.println(r.getDivision());
-				System.out.println(r.getMedicalData());
-				System.out.println("");
-			}
-
-			for (User u : users) {
-				System.out.println(u.toString());
-			}
 
 			if (true) {
 
@@ -108,7 +93,6 @@ public class server implements Runnable {
 							Log.append(splitMsg[1] + " " + splitMsg[2], Log.LOGIN_SUCCESS);
 						else
 							Log.append(splitMsg[1] + " " + splitMsg[2], Log.LOGIN_FAILED);
-							
 
 						oos.writeObject(login);
 						oos.flush();
