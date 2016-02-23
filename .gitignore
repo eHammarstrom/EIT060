@@ -3,6 +3,9 @@
 project_2/bin/
 *.jar
 
+# compiled c code (specifics)
+lab2/src/login
+
 # Log file
 action_log
 *.json
