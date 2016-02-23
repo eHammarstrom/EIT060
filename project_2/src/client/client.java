@@ -10,6 +10,7 @@ import utilities.User;
 
 import java.security.KeyStore;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 /*
  * This example shows how to set up a key manager to perform client
@@ -22,6 +23,7 @@ import java.util.ArrayList;
 public class client {
 	private static User user;
 	private static ArrayList<Record> records;
+	private static char[] password;
 
 	private static BufferedReader read;
 	private static BufferedReader serverMsg;
@@ -62,22 +64,39 @@ public class client {
 				BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
 				System.out.print("Enter keystore: ");
-				
+
 				String keystoreName = br.readLine();
 
-				System.out.print("\nEnter password: ");
+				// System.out.print("\nEnter password: ");
 
-				String pwRead = br.readLine();
-				char[] password = pwRead.toCharArray();
-				
-				// Should be read invisibly
+				// String pwRead = br.readLine();
+				// char[] password = pwRead.toCharArray();
+
+				Console cons = System.console();
+
+				if (cons != null) {
+					password = cons.readPassword("%s", "Password: ");
+				} else {
+					throw new IOException(
+							"Cannot find a console to read password from. Eclipse CANNOT fork a terminal child process.");
+				}
+
+				/**
+				 * JAVA INVISIBLE READ EXAMPLE
+				 * 
+				 * Console cons; char[] passwd; if ((cons = System.console()) !=
+				 * null && (passwd = cons.readPassword("[%s]", "Password:")) !=
+				 * null) { ... java.util.Arrays.fill(passwd, ' '); }
+				 * 
+				 */
 
 				ks.load(new FileInputStream("keystores/" + keystoreName), password); // keystore
-																			// password
-																			// (storepass)
-				ts.load(new FileInputStream("clienttruststore"), password); // truststore
-																			// password
-																			// (storepass);
+				// password
+				// (storepass)
+				char[] cliTrustPW = "password".toCharArray();
+				ts.load(new FileInputStream("clienttruststore"), cliTrustPW); // truststore
+																				// password
+																				// (storepass);
 				kmf.init(ks, password); // user password (keypass)
 				tmf.init(ts); // keystore can be used as truststore here
 				ctx.init(kmf.getKeyManagers(), tmf.getTrustManagers(), null);
@@ -111,32 +130,27 @@ public class client {
 			ois = new ObjectInputStream(socket.getInputStream());
 			records = new ArrayList<Record>();
 
-			boolean isShutdown = false;
 			boolean isLoggedIn = false;
 			boolean isDone = false;
 
-			while (!isLoggedIn) {
-				System.out.println("Provide login command: login <username> <password> \n");
-				System.out.print("Login >");
+			// System.out.println("Provide login command: login <username>
+			// <password> \n");
+			// System.out.print("Login >");
 
-				msg = read.readLine();
+			//Login user with cert nbr
+			msg = cert.getSerialNumber().toString();
+			out.println(msg);
+			out.flush();
 
-				if (msg.equalsIgnoreCase("quit")) {
-					isShutdown = true;
-					break;
-				}
+			isLoggedIn = waitForLoginData();
 
-				out.println(msg);
-				out.flush();
+			if (!isLoggedIn) {
+				System.out.println("This certificate does not have a user. \t Press the RETURN key to exit.");
+				System.console().readLine();
 
-				isLoggedIn = waitForLoginData();
-			}
-
-			if (isShutdown) {
 				out.close();
 				read.close();
 				socket.close();
-
 				return;
 			}
 
@@ -179,9 +193,7 @@ public class client {
 					createRecord();
 					accessDenied = false;
 				}
-				
-				
-				
+
 				else {
 					accessDenied = true;
 				}
@@ -255,7 +267,7 @@ public class client {
 			}
 		}
 	}
-	
+
 	private static void createRecord() throws IOException {
 		boolean isDone = false;
 
@@ -275,6 +287,7 @@ public class client {
 	}
 
 	private static void printHelp() {
+		System.out.println("quit - Exits program.");
 		System.out.println("records - This retrieves a list of available records.");
 		System.out.println("read <record nbr>");
 		System.out.println("edit <record nbr>");
@@ -307,6 +320,8 @@ public class client {
 		} else {
 			return false;
 		}
+		
+		System.out.println("Associated records: ");
 
 		if (!records.isEmpty()) {
 			for (Record r : records) {

@@ -93,8 +93,8 @@ public abstract class User implements Serializable {
 		
 	}
 
-	public User login(String recvUsername, String recvPassword, String recvCertNbr) {
-		if (recvUsername.equals(username) && BCrypt.checkpw(recvPassword, password) && recvCertNbr.equals(certNbr)) {
+	public User login(String recvCertNbr) {
+		if (recvCertNbr.equals(certNbr)) {
 			return this;
 		} else {
 			return null;

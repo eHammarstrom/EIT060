@@ -66,148 +66,140 @@ public class server implements Runnable {
 			users = db.getUsers();
 			records = db.getRecords();
 
-			if (true) {
+			String clientMsg = null;
+			User loggedInUser = null;
+			boolean isLogin = false;
 
-				String clientMsg = null;
-				User loggedInUser = null;
-				boolean isLogin = false;
+			clientMsg = in.readLine();
+			// String[] splitMsg = clientMsg.split("\\s+");
+			User login = null;
 
-				while (!isLogin) {
-					clientMsg = in.readLine();
-					String[] splitMsg = clientMsg.split("\\s+");
-					User login = null;
+			for (User u : users) {
+				System.out.println(cert.getSerialNumber().toString());
+				login = u.login(cert.getSerialNumber().toString());
+				loggedInUser = u;
+				if (login != null) {
+					isLogin = true;
+					break;
+				}
+			}
 
-					if (splitMsg[0].equalsIgnoreCase("login") && splitMsg.length == 3) {
+			if (isLogin)
+				Log.append(cert.getSerialNumber().toString(), Log.LOGIN_SUCCESS);
+			else
+				Log.append(cert.getSerialNumber().toString(), Log.LOGIN_FAILED);
 
-						for (User u : users) {
-							System.out.println(cert.getSerialNumber().toString());
-							login = u.login(splitMsg[1], splitMsg[2], cert.getSerialNumber().toString());
-							loggedInUser = u;
-							if (login != null) {
-								isLogin = true;
-								break;
-							}
-						}
-						
-						if (isLogin)
-							Log.append(splitMsg[1] + " " + splitMsg[2], Log.LOGIN_SUCCESS);
-						else
-							Log.append(splitMsg[1] + " " + splitMsg[2], Log.LOGIN_FAILED);
+			oos.writeObject(login);
+			oos.flush();
 
-						oos.writeObject(login);
-						oos.flush();
-					}
+			if (login != null)
+				System.out.println("Sending: \n" + login.toString());
+			else
+				System.out.println("Sending: NULL");
 
-					if (login != null)
-						System.out.println("Sending: \n" + login.toString());
-					else
-						System.out.println("Sending: NULL");
+			if (login != null && !records.isEmpty()) {
 
-					if (login != null && !records.isEmpty()) {
+				ArrayList<Record> userRecords = getUserRecords(login);
 
-						ArrayList<Record> userRecords = getUserRecords(login);
+				oos.writeObject(userRecords);
+				oos.flush();
+			}
 
-						oos.writeObject(userRecords);
-						oos.flush();
-					}
+			String command = null;
+
+			while ((command = in.readLine()) != null) {
+				String[] commandSplit = command.split("\\s+");
+
+				for (String s : commandSplit) {
+					System.out.println(s);
 				}
 
-				String command = null;
+				boolean recordAccess = true;
+				Record rec = null;
 
-				while ((command = in.readLine()) != null) {
-					String[] commandSplit = command.split("\\s+");
+				if (commandSplit[0].equalsIgnoreCase("recordfetch")) {
+					System.out.println("RECORD FETCH RECEIVED.");
+					Log.append(loggedInUser.toString(), Log.RETR_RECORDS);
 
-					for (String s : commandSplit) {
-						System.out.println(s);
+					ArrayList<Record> userRecords = getUserRecords(loggedInUser);
+
+					for (Record r : userRecords) {
+						System.out.println(r.getId() + " " + r.getMedicalData());
 					}
 
-					boolean recordAccess = true;
-					Record rec = null;
+					oos.writeObject(userRecords);
+					oos.flush();
+				} else if (commandSplit[0].equalsIgnoreCase("create")) {
+					Log.append(loggedInUser.toString(), Log.CREATE);
 
-					if (commandSplit[0].equalsIgnoreCase("recordfetch")) {
-						System.out.println("RECORD FETCH RECEIVED.");
-						Log.append(loggedInUser.toString(), Log.RETR_RECORDS);
+					recordAccess = loggedInUser.createRecord();
+					returnAccess(recordAccess, printWriter);
 
-						ArrayList<Record> userRecords = getUserRecords(loggedInUser);
+					if (recordAccess) {
+						String[] recordData = in.readLine().split("\\s+");
+						String doctor = recordData[0];
+						String nurse = recordData[1];
+						String patient = recordData[2];
+						String division = recordData[3];
+						String medicalData = recordData[4];
 
-						for (Record r : userRecords) {
-							System.out.println(r.getId() + " " + r.getMedicalData());
+						Doctor d = (Doctor) db.getUserFromName(doctor);
+						Nurse n = (Nurse) db.getUserFromName(nurse);
+						Patient p = (Patient) db.getUserFromName(patient);
+
+						if (d != null && n != null && p != null && division != null && medicalData != null) {
+							loggedInUser.createRecord(d, n, p, division, medicalData);
+						} else {
+							System.out.println("CANNOT CREATE RECORD -> NULL EXCEPTION");
 						}
+					}
 
-						oos.writeObject(userRecords);
-						oos.flush();
-					} else if (commandSplit[0].equalsIgnoreCase("create")) {
-						Log.append(loggedInUser.toString(), Log.CREATE);
+					records = db.getRecords();
 
-						recordAccess = loggedInUser.createRecord();
-						returnAccess(recordAccess, printWriter);
-
-						if (recordAccess) {
-							String[] recordData = in.readLine().split("\\s+");
-							String doctor = recordData[0];
-							String nurse = recordData[1];
-							String patient = recordData[2];
-							String division = recordData[3];
-							String medicalData = recordData[4];
-
-							Doctor d = (Doctor) db.getUserFromName(doctor);
-							Nurse n = (Nurse) db.getUserFromName(nurse);
-							Patient p = (Patient) db.getUserFromName(patient);
-							
-							if(d != null && n != null && p != null && division != null && medicalData != null) {
-								loggedInUser.createRecord(d, n, p, division, medicalData);
-							} else {
-								System.out.println("CANNOT CREATE RECORD -> NULL EXCEPTION");
-							}
-						}
-
-						records = db.getRecords();
-
-					} else {
-						for (Record r : records) {
-							System.out.println(r.getId());
-							if (Long.parseLong(commandSplit[1]) == r.getId()) {
-								System.out.println("FOUND RECORD");
-								rec = r;
-								break;
-							}
-						}
-
-						if (rec == null) {
-							System.out.println("RECORD DOES NOT EXIST!");
+				} else {
+					for (Record r : records) {
+						System.out.println(r.getId());
+						if (Long.parseLong(commandSplit[1]) == r.getId()) {
+							System.out.println("FOUND RECORD");
+							rec = r;
 							break;
 						}
 					}
 
-					if (commandSplit[0].equalsIgnoreCase("read")) {
-						Log.append(loggedInUser.toString(), Log.READ);
-
-						recordAccess = loggedInUser.readRecord(rec);
-						returnAccess(recordAccess, printWriter);
-					} else if (commandSplit[0].equalsIgnoreCase("edit")) {
-						Log.append(loggedInUser.toString(), Log.EDIT);
-
-						recordAccess = loggedInUser.writeRecord(rec);
-						returnAccess(recordAccess, printWriter);
-
-						if (recordAccess) {
-							rec.write(in.readLine());
-						}
-
-						records = db.getRecords();
-
-					} else if (commandSplit[0].equalsIgnoreCase("delete")) {
-						Log.append(loggedInUser.toString(), Log.DELETE);
-
-						recordAccess = loggedInUser.deleteRecord(rec);
-						returnAccess(recordAccess, printWriter);
-
-						if (recordAccess) {
-							rec.delete();
-						}
-
-						records = db.getRecords();
+					if (rec == null) {
+						System.out.println("RECORD DOES NOT EXIST!");
+						break;
 					}
+				}
+
+				if (commandSplit[0].equalsIgnoreCase("read")) {
+					Log.append(loggedInUser.toString(), Log.READ);
+
+					recordAccess = loggedInUser.readRecord(rec);
+					returnAccess(recordAccess, printWriter);
+				} else if (commandSplit[0].equalsIgnoreCase("edit")) {
+					Log.append(loggedInUser.toString(), Log.EDIT);
+
+					recordAccess = loggedInUser.writeRecord(rec);
+					returnAccess(recordAccess, printWriter);
+
+					if (recordAccess) {
+						rec.write(in.readLine());
+					}
+
+					records = db.getRecords();
+
+				} else if (commandSplit[0].equalsIgnoreCase("delete")) {
+					Log.append(loggedInUser.toString(), Log.DELETE);
+
+					recordAccess = loggedInUser.deleteRecord(rec);
+					returnAccess(recordAccess, printWriter);
+
+					if (recordAccess) {
+						rec.delete();
+					}
+
+					records = db.getRecords();
 				}
 
 			}

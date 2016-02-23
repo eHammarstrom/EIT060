@@ -40,7 +40,7 @@ public class UserRecordCreation {
 		
 		for(User u : users) {
 			System.out.println(u.getCertNbr());
-			User login = u.login("doctor", "password", "1");
+			User login = u.login("1");
 
 			if (u.getUsername().equals("doctor"))
 				System.out.println(u.getPassword());
