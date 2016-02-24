@@ -59,13 +59,13 @@ public class Record implements Serializable {
 		if (user.getPermissions().equals(PermissionLevel.Agency)) {
 			return true;
 		} else if (user.getPermissions().equals(PermissionLevel.Doctor)
-				&& (user.getDivision().equals(division) || user.getCertNbr() == doctor.getCertNbr())) {
+				&& (user.getDivision().equals(division) || user.getCertNbr().equals(doctor.getCertNbr()))) {
 			return true;
 		} else if (user.getPermissions().equals(PermissionLevel.Nurse)
-				&& (user.getDivision().equals(division) || user.getCertNbr() == nurse.getCertNbr())) {
+				&& (user.getDivision().equals(division) || user.getCertNbr().equals(nurse.getCertNbr()))) {
 			return true;
 		} else if (user.getPermissions().equals(PermissionLevel.Patient)
-				&& user.getCertNbr() == patient.getCertNbr()) {
+				&& user.getCertNbr().equals(patient.getCertNbr())) {
 			return true;
 		}
 			

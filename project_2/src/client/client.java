@@ -133,15 +133,6 @@ public class client {
 			boolean isLoggedIn = false;
 			boolean isDone = false;
 
-			// System.out.println("Provide login command: login <username>
-			// <password> \n");
-			// System.out.print("Login >");
-
-			//Login user with cert nbr
-			msg = cert.getSerialNumber().toString();
-			out.println(msg);
-			out.flush();
-
 			isLoggedIn = waitForLoginData();
 
 			if (!isLoggedIn) {
@@ -165,36 +156,41 @@ public class client {
 				msg = read.readLine();
 				splitMsg = msg.split("\\s+");
 
-				if (msg.equalsIgnoreCase("quit")) {
-					break;
-				} else if (msg.equalsIgnoreCase("help")) {
-					printHelp();
-				} else if (splitMsg[0].equalsIgnoreCase("records")) {
-					printRecords();
-					accessDenied = false;
-				} else if (splitMsg[0].equalsIgnoreCase("edit") && recordExists(splitMsg[1])
-						&& (accessDenied = hasPermissions(msg))) {
-					editRecord(splitMsg[1]);
-					fetchRecords();
-					accessDenied = false;
-				} else if (splitMsg[0].equalsIgnoreCase("read") && recordExists(splitMsg[1])
-						&& (accessDenied = hasPermissions(msg))) {
-					printRecord(splitMsg[1]);
-					accessDenied = false;
-				} else if (splitMsg[0].equalsIgnoreCase("delete") && recordExists(splitMsg[1])
-						&& (accessDenied = hasPermissions(msg))) {
-					for (Record r : records) {
-						if (r.getId() == Long.parseLong(splitMsg[1])) {
-							r.delete(user);
-							accessDenied = false;
+				try {
+					if (msg.equalsIgnoreCase("quit")) {
+						break;
+					} else if (msg.equalsIgnoreCase("help")) {
+						printHelp();
+					} else if (splitMsg[0].equalsIgnoreCase("records")) {
+						printRecords();
+						accessDenied = false;
+					} else if (splitMsg[0].equalsIgnoreCase("edit") && recordExists(splitMsg[1])
+							&& (accessDenied = hasPermissions(msg))) {
+						editRecord(splitMsg[1]);
+						fetchRecords();
+						accessDenied = false;
+					} else if (splitMsg[0].equalsIgnoreCase("read") && recordExists(splitMsg[1])
+							&& (accessDenied = hasPermissions(msg))) {
+						printRecord(splitMsg[1]);
+						accessDenied = false;
+					} else if (splitMsg[0].equalsIgnoreCase("delete") && recordExists(splitMsg[1])
+							&& (accessDenied = hasPermissions(msg))) {
+						for (Record r : records) {
+							if (r.getId() == Long.parseLong(splitMsg[1])) {
+								r.delete(user);
+								accessDenied = false;
+							}
 						}
-					}
-				} else if (splitMsg[0].equalsIgnoreCase("create") && (accessDenied = hasPermissions(msg))) {
-					createRecord();
-					accessDenied = false;
-				}
 
-				else {
+						fetchRecords();
+					} else if (splitMsg[0].equalsIgnoreCase("create") && (accessDenied = hasPermissions(msg))) {
+						createRecord();
+						fetchRecords();
+						accessDenied = false;
+					} else {
+						accessDenied = true;
+					}
+				} catch (Exception e) {
 					accessDenied = true;
 				}
 			}
@@ -303,7 +299,7 @@ public class client {
 
 	private static void printRecord(String rNbr) {
 		for (Record r : records) {
-			if (r.getId() == Long.parseLong(rNbr)) {
+			if (r.getId() == Long.parseLong(rNbr) && r != null) {
 				System.out.println(r.getMedicalData());
 			}
 		}
@@ -320,13 +316,16 @@ public class client {
 		} else {
 			return false;
 		}
-		
-		System.out.println("Associated records: ");
+
 
 		if (!records.isEmpty()) {
+			System.out.println("Associated records: ");
+
 			for (Record r : records) {
 				System.out.println(r.toString());
 			}
+		} else {
+			System.out.println("No associated records.");
 		}
 
 		return true;

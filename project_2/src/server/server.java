@@ -21,8 +21,6 @@ import javax.net.ssl.SSLSocket;
 import javax.net.ssl.TrustManagerFactory;
 import javax.security.cert.X509Certificate;
 
-import utilities.Agency;
-import utilities.DBFileHandler;
 import utilities.Database;
 import utilities.Doctor;
 import utilities.Log;
@@ -66,12 +64,9 @@ public class server implements Runnable {
 			users = db.getUsers();
 			records = db.getRecords();
 
-			String clientMsg = null;
 			User loggedInUser = null;
 			boolean isLogin = false;
 
-			clientMsg = in.readLine();
-			// String[] splitMsg = clientMsg.split("\\s+");
 			User login = null;
 
 			for (User u : users) {
@@ -93,9 +88,9 @@ public class server implements Runnable {
 			oos.flush();
 
 			if (login != null)
-				System.out.println("Sending: \n" + login.toString());
+				System.out.println("Sent user: \t" + login.toString());
 			else
-				System.out.println("Sending: NULL");
+				System.out.println("Sent user: \tNULL");
 
 			if (login != null && !records.isEmpty()) {
 
@@ -158,9 +153,8 @@ public class server implements Runnable {
 
 				} else {
 					for (Record r : records) {
-						System.out.println(r.getId());
 						if (Long.parseLong(commandSplit[1]) == r.getId()) {
-							System.out.println("FOUND RECORD");
+							System.out.println("Found requested record: " + r.getId());
 							rec = r;
 							break;
 						}
@@ -201,7 +195,6 @@ public class server implements Runnable {
 
 					records = db.getRecords();
 				}
-
 			}
 
 			printWriter.close();
@@ -231,7 +224,7 @@ public class server implements Runnable {
 
 		for (Record r : records) {
 			if (login.isAssociated(r)) {
-				System.out.println("FOUND ASSOCIATED RECORD");
+				System.out.println("Found associated record: " + r.getId());
 				userRecords.add(r);
 			} else if (login.getPermissions().equals(PermissionLevel.Agency)) {
 				userRecords.add(r);

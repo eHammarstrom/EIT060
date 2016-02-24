@@ -113,7 +113,8 @@ public class Database {
 				for (User u : users) {
 					if (u.getCertNbr().equals(doctorCertNbr)) {
 						doctor = (Doctor) u;
-					} else if (u.getCertNbr().equals(nurseCertNbr)) {
+					} else if (u.getCertNbr().equals(nurseCertNbr) 
+							|| (u.getPermissions().equals(PermissionLevel.Nurse) && u.getDivision().equals(division))) {
 						nurse = (Nurse) u;
 					} else if (u.getCertNbr().equals(patientCertNbr)) {
 						patient = (Patient) u;
