@@ -2,7 +2,6 @@ package utilities;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import org.mindrot.jbcrypt.BCrypt;
 
 public abstract class User implements Serializable {
 	public static final String DIV_EMERGENCY = "div_emergency";
@@ -10,27 +9,16 @@ public abstract class User implements Serializable {
 	public static final String DIV_REHAB = "div_rehab";
 
 	private String username;
-	private String password;
 	private String division;
 	private String certNbr;
 	protected PermissionLevel permLevel;
 	private ArrayList<Record> records;
 
-	public User(String username, String password, String division, String certNbr, boolean readMode) {
+	public User(String username, String division, String certNbr) {
 		this.username = username;
-
-		if (readMode)
-			this.password = password;
-		else
-			this.password = BCrypt.hashpw(password, BCrypt.gensalt(12));
-
 		this.division = division;
 		this.certNbr = certNbr;
 		this.records = new ArrayList<Record>();
-	}
-
-	public String getPassword() {
-		return password;
 	}
 
 	public String getUsername() {

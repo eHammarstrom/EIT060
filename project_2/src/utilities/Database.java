@@ -175,7 +175,7 @@ public class Database {
 
 		PreparedStatement statement = null;
 		try {
-			String sql = "SELECT username, password, division, certNbr, permissionLevel, certNbr FROM users2";
+			String sql = "SELECT username, division, certNbr, permissionLevel, certNbr FROM users2";
 			statement = conn.prepareStatement(sql);
 			ResultSet result = statement.executeQuery();
 
@@ -185,29 +185,28 @@ public class Database {
 
 				String permLevel = result.getString("permissionLevel");
 				String username = result.getString("username");
-				String password = result.getString("password");
 				String division = result.getString("division");
 				String certNbr = result.getString("certNbr");
 
 				User u = null;
 
 				if (permLevel.equalsIgnoreCase("agency")) {
-					u = new Agency(username, password, division, certNbr, true);
+					u = new Agency(username, division, certNbr);
 					System.out.println("CREATED AGENCY: " + u.toString());
 				}
 
 				if (permLevel.equalsIgnoreCase("doctor")) {
-					u = new Doctor(username, password, division, certNbr, true);
+					u = new Doctor(username, division, certNbr);
 					System.out.println("CREATED DOCTOR: " + u.toString());
 				}
 
 				if (permLevel.equalsIgnoreCase("nurse")) {
-					u = new Nurse(username, password, division, certNbr, true);
+					u = new Nurse(username, division, certNbr);
 					System.out.println("CREATED NURSE: " + u.toString());
 				}
 
 				if (permLevel.equalsIgnoreCase("patient")) {
-					u = new Patient(username, password, division, certNbr, true);
+					u = new Patient(username, division, certNbr);
 					System.out.println("CREATED PATIENT: " + u.toString());
 				}
 
@@ -234,13 +233,12 @@ public class Database {
 
 		PreparedStatement statement = null;
 		try {
-			String sql = "INSERT INTO users2(username, password, division, permissionLevel, certNbr) VALUES(?,?,?,?,?)";
+			String sql = "INSERT INTO users2(username, division, permissionLevel, certNbr) VALUES(?,?,?,?)";
 			statement = conn.prepareStatement(sql);
 			statement.setString(1, u.getUsername());
-			statement.setString(2, u.getPassword());
-			statement.setString(3, u.getDivision());
-			statement.setString(4, u.getPermissions().toString());
-			statement.setString(5, u.getCertNbr());
+			statement.setString(2, u.getDivision());
+			statement.setString(3, u.getPermissions().toString());
+			statement.setString(4, u.getCertNbr());
 			statement.executeUpdate();
 
 		} catch (SQLException e) {
@@ -323,13 +321,13 @@ public class Database {
 		getUsers();
 	}
 
-	public void loadTestData() {
-		Doctor doc_1 = new Doctor("doctor", "password", User.DIV_EMERGENCY, "13334610649522941717", false);
-		Nurse nurse_1 = new Nurse("nurse", "password", User.DIV_REHAB, "2", false);
-		Nurse nurse_2 = new Nurse("nurse2", "password", User.DIV_EMERGENCY, "3", false);
-		Patient patient_1 = new Patient("patient", "password", User.DIV_REHAB, "4", false);
-		Patient patient_2 = new Patient("patient2", "password", User.DIV_REHAB, "5", false);
-		Agency agency_1 = new Agency("agency", "password", User.DIV_REHAB, "6", false);
+	/** public void loadTestData() {
+		Doctor doc_1 = new Doctor("doctor", User.DIV_EMERGENCY, "13334610649522941717");
+		Nurse nurse_1 = new Nurse("nurse", User.DIV_REHAB, "2");
+		Nurse nurse_2 = new Nurse("nurse2", User.DIV_EMERGENCY, "3");
+		Patient patient_1 = new Patient("patient", User.DIV_REHAB, "4");
+		Patient patient_2 = new Patient("patient2", User.DIV_REHAB, "5");
+		Agency agency_1 = new Agency("agency", User.DIV_REHAB, "6");
 
 		Record r = new Record(doc_1, nurse_1, patient_1, User.DIV_REHAB, "Ont i benet");
 		Record r2 = new Record(doc_1, nurse_1, patient_1, User.DIV_REHAB, "Ont i armen");
@@ -347,6 +345,6 @@ public class Database {
 		this.insertRecord(r2);
 		this.insertRecord(r3);
 		this.insertRecord(r4);
-	}
+	} **/
 
 }
