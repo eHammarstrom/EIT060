@@ -10,8 +10,11 @@
 3. Start client in the folder project_2/ with IP and PORT as arguments in the mentioned order.
 
 > The server is compiled to a runnable JAR file in this scenario. May be executed in the eclipse environment.
-```shell
-java -jar server.jar 6666
 
+```zsh
+java -jar server.jar 6666
+```
+
+```zsh
 java -jar client.jar localhost 6666
 ```
