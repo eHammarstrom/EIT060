@@ -6,4 +6,12 @@
 2. Compile client in eclipse.
   1. Right-click client.java.
   2. Export as RUNNABLE JAR.
-3. Start client in folder project_2/ with IP and PORT as arguments in mentioned order.
+  3. Select the client to be the launch configuration.
+3. Start client in the folder project_2/ with IP and PORT as arguments in the mentioned order.
+
+> The server is compiled to a runnable JAR file in this scenario. May be executed in the eclipse environment.
+```shell
+java -jar server.jar 6666
+
+java -jar client.jar localhost 6666
+```
