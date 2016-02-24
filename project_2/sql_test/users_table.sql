@@ -37,7 +37,7 @@ CREATE TABLE `users2` (
 
 LOCK TABLES `users2` WRITE;
 /*!40000 ALTER TABLE `users2` DISABLE KEYS */;
-INSERT INTO `users2` VALUES ('doctor','div_emergency','Doctor','13334610649522941717'),('nurse','div_rehab','Nurse','13334610649522941719'),('patient','div_rehab','Patient','13334610649522941720'),('nsa','div_rehab','Agency','13334610649522941721'),('patient2','div_rehab','Patient','13334610649522941724'),('nurse2','div_emergency','Nurse','13334610649522941725'),('nurse3','div_rehab','Nurse','13334610649522941726');
+INSERT INTO `users2` VALUES ('doctor','div_emergency','Doctor','13334610649522941717'),('nurse','div_rehab','Nurse','13334610649522941719'),('patient','div_rehab','Patient','13334610649522941720'),('nsa','div_rehab','Agency','13334610649522941721'),('doctor2','div_rehab','Doctor','13334610649522941722'),('patient2','div_rehab','Patient','13334610649522941724'),('nurse2','div_emergency','Nurse','13334610649522941725'),('nurse3','div_rehab','Nurse','13334610649522941726');
 /*!40000 ALTER TABLE `users2` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -50,4 +50,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2016-02-24 20:44:24
+-- Dump completed on 2016-02-24 20:57:42
