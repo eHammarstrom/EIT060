@@ -4,13 +4,11 @@ import java.io.*;
 import javax.net.ssl.*;
 import javax.security.cert.X509Certificate;
 
-import utilities.PermissionLevel;
 import utilities.Record;
 import utilities.User;
 
 import java.security.KeyStore;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 /*
  * This example shows how to set up a key manager to perform client
@@ -280,6 +278,9 @@ public class client {
 				System.out.println("Successfully created record.");
 			}
 		}
+
+		if (!serverMsg.readLine().equals("created"))
+			System.out.println("Input error.");
 	}
 
 	private static void printHelp() {

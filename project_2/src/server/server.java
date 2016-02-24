@@ -144,8 +144,12 @@ public class server implements Runnable {
 
 						if (d != null && n != null && p != null && division != null && medicalData != null) {
 							loggedInUser.createRecord(d, n, p, division, medicalData);
+							printWriter.println("created");
+							printWriter.flush();
 						} else {
 							System.out.println("CANNOT CREATE RECORD -> NULL EXCEPTION");
+							printWriter.println("error");
+							printWriter.flush();
 						}
 					}
 
