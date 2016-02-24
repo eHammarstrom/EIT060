@@ -10,6 +10,7 @@ import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.security.KeyStore;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import javax.net.ServerSocketFactory;
 import javax.net.ssl.KeyManagerFactory;
@@ -136,7 +137,10 @@ public class server implements Runnable {
 						String nurse = recordData[1];
 						String patient = recordData[2];
 						String division = recordData[3];
-						String medicalData = recordData[4];
+						String medicalData = "";
+
+						for (int i = 4; i < recordData.length; i++)
+							medicalData += recordData[i] + " ";
 
 						Doctor d = (Doctor) db.getUserFromName(doctor);
 						Nurse n = (Nurse) db.getUserFromName(nurse);
