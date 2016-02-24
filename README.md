@@ -14,7 +14,6 @@
 ```zsh
 java -jar server.jar 6666
 ```
-
 ```zsh
 java -jar client.jar localhost 6666
 ```
