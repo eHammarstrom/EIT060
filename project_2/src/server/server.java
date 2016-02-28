@@ -71,6 +71,9 @@ public class server implements Runnable {
 
 			User login = null;
 
+			/**
+			 * Check if connected client is a user according to their certificate.
+			 */
 			for (User u : users) {
 				System.out.println(cert.getSerialNumber().toString());
 				login = u.login(cert.getSerialNumber().toString());
@@ -81,8 +84,10 @@ public class server implements Runnable {
 				}
 			}
 
+			// Log login status, access/deny.
 			Log.append(cert.getSerialNumber().toString(), Log.LOGIN, isLogin);
 
+			// First post user to client.
 			oos.writeObject(login);
 			oos.flush();
 
@@ -91,6 +96,7 @@ public class server implements Runnable {
 			else
 				System.out.println("Sent user: \tNULL");
 
+			// If user is associated to records post them to client.
 			if (login != null && !records.isEmpty()) {
 
 				ArrayList<Record> userRecords = getUserRecords(login);
@@ -101,6 +107,9 @@ public class server implements Runnable {
 
 			String command = null;
 
+			/***
+			 * Await String command input from this client connection.
+			 */
 			while ((command = in.readLine()) != null) {
 				String[] commandSplit = command.split("\\s+");
 
@@ -215,6 +224,11 @@ public class server implements Runnable {
 
 	}
 
+	/***
+	 * Retrieves all records associated to a user according to the ACL.
+	 * @param login to associate records.
+	 * @return array of associated records.
+	 */
 	private ArrayList<Record> getUserRecords(User login) {
 		if (login == null)
 			System.err.println("LOGIN WAS NULL> getUserRecords(login)");
@@ -233,6 +247,11 @@ public class server implements Runnable {
 		return userRecords;
 	}
 
+	/***
+	 * Returns a String answer over the TLS connection to connected client.
+	 * @param ans
+	 * @param printWriter
+	 */
 	private void returnAccess(boolean ans, PrintWriter printWriter) {
 		if (ans == true) {
 			printWriter.println("granted");

@@ -198,7 +198,12 @@ public class client {
 			e.printStackTrace();
 		}
 	}
-
+	
+	/**
+	 * Query an update of the client-sided records from server.
+	 * @throws ClassNotFoundException
+	 * @throws IOException
+	 */
 	private static void fetchRecords() throws ClassNotFoundException, IOException {
 		out.println("recordfetch");
 		out.flush();
@@ -210,6 +215,12 @@ public class client {
 			System.out.println(r.getId() + " " + r.getMedicalData());
 	}
 
+	/**
+	 * Query the server to check if user has permission x.
+	 * @param msg
+	 * @return
+	 * @throws IOException
+	 */
 	private static boolean hasPermissions(String msg) throws IOException {
 		out.println(msg);
 		out.flush();
@@ -221,6 +232,12 @@ public class client {
 		return false;
 	}
 
+	/**
+	 * Sets client command line in an editing state and submits data to server
+	 * unless it is interrupted by the user.
+	 * @param rNbr
+	 * @throws IOException
+	 */
 	private static void editRecord(String rNbr) throws IOException {
 		Record record = null;
 		boolean isDone = false;
@@ -247,6 +264,11 @@ public class client {
 		}
 	}
 
+	/**
+	 * Sets client command line in a Record creation state 
+	 * before submitting to server, unless interrupted by user.
+	 * @throws IOException
+	 */
 	private static void createRecord() throws IOException {
 		boolean isDone = false;
 
@@ -268,43 +290,23 @@ public class client {
 			System.out.println("Input error.");
 	}
 
+	/**
+	 * Prints somewhat formatted list of commands.
+	 */
 	private static void printHelp() {
 		System.out.println("quit - Exits program.");
 		System.out.println("records - This retrieves a list of available records.");
-		System.out.println("read <record nbr>");
-		System.out.println("edit <record nbr>");
-		System.out.println("delete <record nbr>");
-		System.out.println("create");
+		System.out.println("read <record nbr> - Displays medical data specified record.");
+		System.out.println("edit <record nbr> - Edit specified record.");
+		System.out.println("delete <record nbr> - Delete specified record.");
+		System.out.println("create - Enters record creation.");
 	}
 
+	/**
+	 * Prints records associated to client user.
+	 */
 	private static void printRecords() {
-		for (Record r : records) {
-			System.out.println(r.toString());
-		}
-	}
-
-	private static void printRecord(String rNbr) {
-		for (Record r : records) {
-			if (r.getId() == Long.parseLong(rNbr) && r != null) {
-				System.out.println(r.getMedicalData());
-			}
-		}
-	}
-
-	private static boolean waitForLoginData() throws IOException, ClassNotFoundException {
-		user = (User) ois.readObject();
-
-		if (user != null) {
-			System.out.println(user.toString());
-
-			records = (ArrayList<Record>) ois.readObject();
-
-		} else {
-			return false;
-		}
-
-
-		if (!records.isEmpty()) {
+		if (!records.isEmpty()){
 			System.out.println("Associated records: ");
 
 			for (Record r : records) {
@@ -313,6 +315,38 @@ public class client {
 		} else {
 			System.out.println("No associated records.");
 		}
+	}
+
+	/**
+	 * Prints specified record.
+	 * @param rNbr record ID
+	 */
+	private static void printRecord(String rNbr) {
+		for (Record r : records) {
+			if (r.getId() == Long.parseLong(rNbr) && r != null) {
+				System.out.println(r.getMedicalData());
+			}
+		}
+	}
+
+	/**
+	 * Function awaits a User object followed by 0 or more Record objects in an array.
+	 * @return true if successful
+	 * @throws IOException
+	 * @throws ClassNotFoundException
+	 */
+	private static boolean waitForLoginData() throws IOException, ClassNotFoundException {
+		user = (User) ois.readObject();
+
+		if (user != null) {
+			System.out.println(user.toString());
+
+			records = (ArrayList<Record>) ois.readObject();
+		} else {
+			return false;
+		}
+		
+		printRecords();
 
 		return true;
 	}
