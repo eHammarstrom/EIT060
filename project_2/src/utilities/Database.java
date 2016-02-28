@@ -98,7 +98,7 @@ public class Database {
 				String doctorCertNbr = result.getString("doctor");
 				String nurseCertNbr = result.getString("nurse");
 				String patientCertNbr = result.getString("patient");
-				String division = result.getString("division");
+				Division division = new Division(result.getString("division"));
 				String medicalData = result.getString("medicalData");
 				long id = result.getLong("id");
 
@@ -144,33 +144,6 @@ public class Database {
 
 	}
 
-	private Record getRecord(long id) {
-		for (Record r : records) {
-			if (r.getId() == id) {
-				return r;
-			}
-		}
-		return null;
-	}
-
-	private User getUser(String certNbr) {
-		for (User u : users) {
-			if (u.getCertNbr().equals(certNbr)) {
-				return u;
-			}
-		}
-		return null;
-	}
-	
-	public User getUserFromName(String username) {
-		for(User u : users) {
-			if(u.getUsername().equals(username)) {
-				return u;
-			}
-		}
-		return null;
-	}
-
 	public ArrayList<User> getUsers() {
 
 		PreparedStatement statement = null;
@@ -185,10 +158,11 @@ public class Database {
 
 				String permLevel = result.getString("permissionLevel");
 				String username = result.getString("username");
-				String division = result.getString("division");
+				Division division = new Division(result.getString("division"));
 				String certNbr = result.getString("certNbr");
-
+				
 				User u = null;
+				
 
 				if (permLevel.equalsIgnoreCase("agency")) {
 					u = new Agency(username, division, certNbr);
@@ -228,6 +202,42 @@ public class Database {
 		}
 		return null;
 	}
+	
+	private Record getRecord(long id) {
+		for (Record r : records) {
+			if (r.getId() == id) {
+				return r;
+			}
+		}
+		return null;
+	}
+
+	private User getUser(String certNbr) {
+		for (User u : users) {
+			if (u.getCertNbr().equals(certNbr)) {
+				return u;
+			}
+		}
+		return null;
+	}
+	
+	public User getUserFromName(String username) {
+		for(User u : users) {
+			if(u.getUsername().equals(username)) {
+				return u;
+			}
+		}
+		return null;
+	}
+	
+	public Division getDivision(String name) {
+		for(Record r : records) {
+			if(r.getDivision().equals(name)) {
+				return r.getDivision();
+			}
+		}
+		return null;
+	}
 
 	public void insertUser(User u) {
 
@@ -236,7 +246,7 @@ public class Database {
 			String sql = "INSERT INTO users2(username, division, permissionLevel, certNbr) VALUES(?,?,?,?)";
 			statement = conn.prepareStatement(sql);
 			statement.setString(1, u.getUsername());
-			statement.setString(2, u.getDivision());
+			statement.setString(2, u.getDivision().getName());
 			statement.setString(3, u.getPermissions().toString());
 			statement.setString(4, u.getCertNbr());
 			statement.executeUpdate();
@@ -261,7 +271,7 @@ public class Database {
 			statement.setString(1, r.getDoctorCertNbr());
 			statement.setString(2, r.getNurseCertNbr());
 			statement.setString(3, r.getPatientCertNbr());
-			statement.setString(4, r.getDivision());
+			statement.setString(4, r.getDivision().getName());
 			statement.setString(5, r.getMedicalData());
 			statement.executeUpdate();
 

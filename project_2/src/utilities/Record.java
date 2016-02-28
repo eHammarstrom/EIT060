@@ -7,11 +7,11 @@ public class Record implements Serializable {
 	private Doctor doctor;
 	private Nurse nurse;
 	private Patient patient;
-	private String division;
+	private Division division;
 	private String medicalData;
 	private long id;
 
-	public Record(Doctor doctor, Nurse nurse, Patient patient, String division, String medicalData) {
+	public Record(Doctor doctor, Nurse nurse, Patient patient, Division division, String medicalData) {
 		this.doctor = doctor;
 		this.nurse = nurse;
 		this.patient = patient;
@@ -39,7 +39,7 @@ public class Record implements Serializable {
 		return patient.getCertNbr();
 	}
 
-	public String getDivision() {
+	public Division getDivision() {
 		return division;
 	}
 

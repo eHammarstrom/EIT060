@@ -23,6 +23,7 @@ import javax.net.ssl.TrustManagerFactory;
 import javax.security.cert.X509Certificate;
 
 import utilities.Database;
+import utilities.Division;
 import utilities.Doctor;
 import utilities.Log;
 import utilities.Nurse;
@@ -139,9 +140,10 @@ public class server implements Runnable {
 						Doctor d = (Doctor) db.getUserFromName(doctor);
 						Nurse n = (Nurse) db.getUserFromName(nurse);
 						Patient p = (Patient) db.getUserFromName(patient);
+						Division div = db.getDivision(division);
 
 						if (d != null && n != null && p != null && division != null && medicalData != null) {
-							loggedInUser.createRecord(d, n, p, division, medicalData);
+							loggedInUser.createRecord(d, n, p, div, medicalData);
 							printWriter.println("created");
 							printWriter.flush();
 						} else {
