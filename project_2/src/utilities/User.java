@@ -48,6 +48,9 @@ public abstract class User implements Serializable {
 	}
 
 	public boolean readRecord(Record r) {
+		if (r == null)
+			return false;
+		
 		return r.read(this);
 	}
 
@@ -99,12 +102,6 @@ public abstract class User implements Serializable {
 		sb.append(certNbr);
 		sb.append("\t");
 		sb.append(permLevel);
-
-		if (records != null) {
-			for (Record r : records) {
-				sb.append("\t" + r.toString());
-			}
-		}
 
 		return sb.toString();
 	}

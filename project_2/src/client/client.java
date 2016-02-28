@@ -162,17 +162,14 @@ public class client {
 					} else if (splitMsg[0].equalsIgnoreCase("records")) {
 						printRecords();
 						accessDenied = false;
-					} else if (splitMsg[0].equalsIgnoreCase("edit") && recordExists(splitMsg[1])
-							&& (accessDenied = hasPermissions(msg))) {
+					} else if (splitMsg[0].equalsIgnoreCase("edit") && (accessDenied = hasPermissions(msg))) {
 						editRecord(splitMsg[1]);
 						fetchRecords();
 						accessDenied = false;
-					} else if (splitMsg[0].equalsIgnoreCase("read") && recordExists(splitMsg[1])
-							&& (accessDenied = hasPermissions(msg))) {
+					} else if (splitMsg[0].equalsIgnoreCase("read") && (accessDenied = hasPermissions(msg))) {
 						printRecord(splitMsg[1]);
 						accessDenied = false;
-					} else if (splitMsg[0].equalsIgnoreCase("delete") && recordExists(splitMsg[1])
-							&& (accessDenied = hasPermissions(msg))) {
+					} else if (splitMsg[0].equalsIgnoreCase("delete") && (accessDenied = hasPermissions(msg))) {
 						for (Record r : records) {
 							if (r.getId() == Long.parseLong(splitMsg[1])) {
 								r.delete(user);
@@ -222,18 +219,6 @@ public class client {
 		}
 
 		return false;
-	}
-
-	private static boolean recordExists(String rNbr) {
-		boolean exists = false;
-
-		for (Record r : records) {
-			if (r.getId() == Long.parseLong(splitMsg[1])) {
-				exists = true;
-			}
-		}
-
-		return exists;
 	}
 
 	private static void editRecord(String rNbr) throws IOException {

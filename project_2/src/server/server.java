@@ -80,10 +80,7 @@ public class server implements Runnable {
 				}
 			}
 
-			if (isLogin)
-				Log.append(cert.getSerialNumber().toString(), Log.LOGIN_SUCCESS);
-			else
-				Log.append(cert.getSerialNumber().toString(), Log.LOGIN_FAILED);
+			Log.append(cert.getSerialNumber().toString(), Log.LOGIN, isLogin);
 
 			oos.writeObject(login);
 			oos.flush();
@@ -115,7 +112,6 @@ public class server implements Runnable {
 
 				if (commandSplit[0].equalsIgnoreCase("recordfetch")) {
 					System.out.println("RECORD FETCH RECEIVED.");
-					Log.append(loggedInUser.toString(), Log.RETR_RECORDS);
 
 					ArrayList<Record> userRecords = getUserRecords(loggedInUser);
 
@@ -126,8 +122,6 @@ public class server implements Runnable {
 					oos.writeObject(userRecords);
 					oos.flush();
 				} else if (commandSplit[0].equalsIgnoreCase("create")) {
-					Log.append(loggedInUser.toString(), Log.CREATE);
-
 					recordAccess = loggedInUser.createRecord();
 					returnAccess(recordAccess, printWriter);
 
@@ -170,18 +164,13 @@ public class server implements Runnable {
 
 					if (rec == null) {
 						System.out.println("RECORD DOES NOT EXIST!");
-						break;
 					}
 				}
 
 				if (commandSplit[0].equalsIgnoreCase("read")) {
-					Log.append(loggedInUser.toString(), Log.READ);
-
 					recordAccess = loggedInUser.readRecord(rec);
 					returnAccess(recordAccess, printWriter);
 				} else if (commandSplit[0].equalsIgnoreCase("edit")) {
-					Log.append(loggedInUser.toString(), Log.EDIT);
-
 					recordAccess = loggedInUser.writeRecord(rec);
 					returnAccess(recordAccess, printWriter);
 
@@ -192,8 +181,6 @@ public class server implements Runnable {
 					records = db.getRecords();
 
 				} else if (commandSplit[0].equalsIgnoreCase("delete")) {
-					Log.append(loggedInUser.toString(), Log.DELETE);
-
 					recordAccess = loggedInUser.deleteRecord(rec);
 					returnAccess(recordAccess, printWriter);
 
@@ -203,6 +190,8 @@ public class server implements Runnable {
 
 					records = db.getRecords();
 				}
+
+				Log.append(loggedInUser.toString(), command, recordAccess);
 			}
 
 			printWriter.close();

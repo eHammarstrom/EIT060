@@ -5,23 +5,17 @@ import java.io.PrintWriter;
 import java.util.Calendar;
 
 public class Log {
-	public static final String LOGIN_SUCCESS = "LOGIN SUCCESSFUL";
-	public static final String LOGIN_FAILED = "LOGIN FAILED";
-	public static final String EDIT = "EDIT";
-	public static final String CREATE = "CREATE";
-	public static final String READ = "READ";
-	public static final String DELETE = "DELETE";
-	public static final String RETR_RECORDS = "RETRIEVED RECORDS";
+	public static final String LOGIN = "LOGIN";
 
 	private static final String LOG_NAME = "action_log";
 	private static PrintWriter printWriter;
 	
-	public static void append(String info, String operation) {
+	public static void append(String info, String operation, Boolean status) {
 		try {
 			printWriter = new PrintWriter(new FileWriter(LOG_NAME, true));
 
 			printWriter.print(Calendar.getInstance().getTime().toString() + "\t");
-			printWriter.print(info + "\t" + operation + "\n");
+			printWriter.print(info + "\t" + operation + "\t ACCESS: " + status + "\n");
 			printWriter.flush();
 
 			printWriter.close();
