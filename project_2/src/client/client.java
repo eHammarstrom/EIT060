@@ -134,7 +134,7 @@ public class client {
 			isLoggedIn = waitForLoginData();
 
 			if (!isLoggedIn) {
-				System.out.println("This certificate does not have a user. \t Press the RETURN key to exit.");
+				System.out.println("This certificate does not have a user. \n Press the RETURN key to exit.");
 				System.console().readLine();
 
 				out.close();
@@ -147,7 +147,7 @@ public class client {
 
 			while (!isDone) {
 				if (accessDenied) {
-					System.out.println("Access denied, or no such record exists! \t Type 'help' for commands.");
+					System.out.println("Access denied, or no such record exists! \n Type 'help' for commands.");
 				}
 
 				System.out.print(user.getUsername() + " commands>");

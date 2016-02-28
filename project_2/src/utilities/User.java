@@ -4,17 +4,17 @@ import java.io.Serializable;
 import java.util.ArrayList;
 
 public abstract class User implements Serializable {
-	public static final String DIV_EMERGENCY = "div_emergency";
-	public static final String DIV_ACTIVECARE = "div_activecare";
-	public static final String DIV_REHAB = "div_rehab";
+//	public static final String DIV_EMERGENCY = "div_emergency";
+//	public static final String DIV_ACTIVECARE = "div_activecare";
+//	public static final String DIV_REHAB = "div_rehab";
 
 	private String username;
-	private String division;
+	private Division division;
 	private String certNbr;
 	protected PermissionLevel permLevel;
 	private ArrayList<Record> records;
 
-	public User(String username, String division, String certNbr) {
+	public User(String username, Division division, String certNbr) {
 		this.username = username;
 		this.division = division;
 		this.certNbr = certNbr;
@@ -29,7 +29,7 @@ public abstract class User implements Serializable {
 		return certNbr;
 	}
 
-	public String getDivision() {
+	public Division getDivision() {
 		return division;
 	}
 
@@ -37,6 +37,10 @@ public abstract class User implements Serializable {
 		return permLevel;
 	}
 
+	public void addRecord(Record r) {
+		records.add(r);
+	}
+	
 	public boolean isAssociated(Record r) {
 		for (Record tempRecord : records) {
 			if (tempRecord.getId() == r.getId()) {
@@ -45,7 +49,7 @@ public abstract class User implements Serializable {
 		}
 
 		return false;
-	}
+	} 
 
 	public boolean readRecord(Record r) {
 		if (r == null)
@@ -57,6 +61,10 @@ public abstract class User implements Serializable {
 	public boolean writeRecord(Record r) {
 		return r.write(this);
 	}
+	
+	public boolean deleteRecord(Record r) {
+		return r.delete(this);
+	}
 
 	public boolean createRecord() {
 		if (permLevel == PermissionLevel.Doctor) {
@@ -65,16 +73,8 @@ public abstract class User implements Serializable {
 
 		return false;
 	}
-
-	public boolean deleteRecord(Record r) {
-		return r.delete(this);
-	}
-
-	public void addRecord(Record r) {
-		records.add(r);
-	}
 	
-	public void createRecord(Doctor doctor, Nurse nurse, Patient patient, String divsion, String medicalData) {
+	public void createRecord(Doctor doctor, Nurse nurse, Patient patient, Division divsion, String medicalData) {
 		
 		Record r = new Record(doctor, nurse, patient, division, medicalData);
 		Database db = Database.getInstance();
@@ -97,7 +97,7 @@ public abstract class User implements Serializable {
 
 		sb.append(username);
 		sb.append("\t");
-		sb.append(division);
+		sb.append(division.getName());
 		sb.append("\t");
 		sb.append(certNbr);
 		sb.append("\t");
