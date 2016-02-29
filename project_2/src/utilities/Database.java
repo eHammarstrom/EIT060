@@ -57,7 +57,7 @@ public class Database {
 
 	/**
 	 * Public method, which is the only method allowed to return an instance of
-	 * the singleton (the instance here is the database connection statement)
+	 * the singleton
 	 */
 
 	public static Database getInstance() {
@@ -82,6 +82,11 @@ public class Database {
 	public boolean isConnected() {
 		return conn != null;
 	}
+	
+	/***
+	 * Retrieves all records 
+	 * @return array of all records.
+	 */
 
 	public ArrayList<Record> getRecords() {
 
@@ -143,6 +148,11 @@ public class Database {
 		return null;
 
 	}
+	
+	/***
+	 * Retrieves all users 
+	 * @return array of all users.
+	 */
 
 	public ArrayList<User> getUsers() {
 
@@ -203,41 +213,10 @@ public class Database {
 		return null;
 	}
 	
-	private Record getRecord(long id) {
-		for (Record r : records) {
-			if (r.getId() == id) {
-				return r;
-			}
-		}
-		return null;
-	}
-
-	private User getUser(String certNbr) {
-		for (User u : users) {
-			if (u.getCertNbr().equals(certNbr)) {
-				return u;
-			}
-		}
-		return null;
-	}
-	
-	public User getUserFromName(String username) {
-		for(User u : users) {
-			if(u.getUsername().equals(username)) {
-				return u;
-			}
-		}
-		return null;
-	}
-	
-	public Division getDivision(String name) {
-		for(Record r : records) {
-			if(r.getDivision().equals(name)) {
-				return r.getDivision();
-			}
-		}
-		return null;
-	}
+	/***
+	 * Inserts a user 
+	 * @param user
+	 */
 
 	public void insertUser(User u) {
 
@@ -261,6 +240,11 @@ public class Database {
 			}
 		}
 	}
+	
+	/***
+	 * Inserts a record
+	 * @param record
+	 */
 
 	public void insertRecord(Record r) {
 
@@ -285,6 +269,11 @@ public class Database {
 			}
 		}
 	}
+	
+	/***
+	 * Writes to a record with new medical data
+	 * @param medicalData, id
+	 */
 
 	public void writeRecord(String medicalData, long id) {
 		PreparedStatement statement = null;
@@ -304,6 +293,11 @@ public class Database {
 			}
 		}
 	}
+	
+	/***
+	 * Deletes a specific record with id
+	 * @param id 
+	 */
 
 	public void deleteRecord(long id) {
 		PreparedStatement statement = null;
@@ -322,13 +316,39 @@ public class Database {
 			}
 		}
 	}
-
-	public void updateRecords() {
-		getRecords();
+	
+	public User getUserFromName(String username) {
+		for(User u : users) {
+			if(u.getUsername().equals(username)) {
+				return u;
+			}
+		}
+		return null;
 	}
+	
+	public Division getDivision(String name) {
+		for(Record r : records) {
+			if(r.getDivision().equals(name)) {
+				return r.getDivision();
+			}
+		}
+		return null;
+	}
+	
+	/***
+	 * Updates the records in the database
+	 */
 
-	public void updateUsers() {
-		getUsers();
+	public ArrayList<Record> updateRecords() {
+		return getRecords();
+	}
+	
+	/***
+	 * Updates the users in the database
+	 */
+
+	public ArrayList<User> updateUsers() {
+		return getUsers();
 	}
 
 	/** public void loadTestData() {

@@ -4,10 +4,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 
 public abstract class User implements Serializable {
-//	public static final String DIV_EMERGENCY = "div_emergency";
-//	public static final String DIV_ACTIVECARE = "div_activecare";
-//	public static final String DIV_REHAB = "div_rehab";
-
 	private String username;
 	private Division division;
 	private String certNbr;
@@ -36,10 +32,26 @@ public abstract class User implements Serializable {
 	public PermissionLevel getPermissions() {
 		return permLevel;
 	}
-
-	public void addRecord(Record r) {
-		records.add(r);
+	
+	/***
+	 * Tries to login the user with a specific certNbr
+	 * @param recvCertNbr
+	 * @return this user or null
+	 */
+	
+	public User login(String recvCertNbr) {
+		if (recvCertNbr.equals(certNbr)) {
+			return this;
+		} else {
+			return null;
+		}
 	}
+	
+	/***
+	 * Checks if this user is associated with a certain record r
+	 * @param r
+	 * @return true or false
+	 */
 	
 	public boolean isAssociated(Record r) {
 		for (Record tempRecord : records) {
@@ -50,29 +62,65 @@ public abstract class User implements Serializable {
 
 		return false;
 	} 
+	
+	/***
+	 * Adds a record to the user
+	 * @param r
+	 */
+
+	public void addRecord(Record r) {
+		records.add(r);
+	}
+	
+	/***
+	 * Checks if this user can read a certain record
+	 * @param r
+	 * @return true or false
+	 */
 
 	public boolean readRecord(Record r) {
-		if (r == null)
-			return false;
-		
 		return r.read(this);
 	}
+	
+	/***
+	 * Checks if this user has permission to write to a certain record
+	 * @param r
+	 * @return true or false
+	 */
 
 	public boolean writeRecord(Record r) {
 		return r.write(this);
 	}
 	
+	/***
+	 * Checks if this user has permission to delete a certain record
+	 * @param r
+	 * @return true or false
+	 */
+	
 	public boolean deleteRecord(Record r) {
-		return r.delete(this);
+		if(r != null) {
+			return r.delete(this);
+		}
+		return false;
 	}
+	
+	/***
+	 * Checks if this user has permission to create a new record
+	 * @return true or false
+	 */
 
 	public boolean createRecord() {
 		if (permLevel == PermissionLevel.Doctor) {
 			return true;
 		}
-
 		return false;
 	}
+	
+	/***
+	 * Creates a new record and updates the database
+	 * @param doctor, nurse, patient, division. medicalData
+	 */
 	
 	public void createRecord(Doctor doctor, Nurse nurse, Patient patient, Division divsion, String medicalData) {
 		
@@ -83,14 +131,11 @@ public abstract class User implements Serializable {
 		this.addRecord(r);
 		
 	}
-
-	public User login(String recvCertNbr) {
-		if (recvCertNbr.equals(certNbr)) {
-			return this;
-		} else {
-			return null;
-		}
-	}
+	
+	/***
+	 * Makes a appropriate String description for the log
+	 * @return String
+	 */
 
 	public String toString() {
 		StringBuilder sb = new StringBuilder();

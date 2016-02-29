@@ -60,15 +60,17 @@ public class server implements Runnable {
 			BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 			ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());
 			PrintWriter printWriter = new PrintWriter(socket.getOutputStream());
+			
+			/**
+			 *  Get the data from the database instance
+			 */
 
 			Database db = Database.getInstance();
-
 			users = db.getUsers();
 			records = db.getRecords();
 
 			User loggedInUser = null;
 			boolean isLogin = false;
-
 			User login = null;
 
 			/**
@@ -162,7 +164,7 @@ public class server implements Runnable {
 						}
 					}
 
-					records = db.getRecords();
+					records = db.updateRecords();
 
 				} else {
 					for (Record r : records) {
@@ -189,7 +191,7 @@ public class server implements Runnable {
 						rec.write(in.readLine());
 					}
 
-					records = db.getRecords();
+					records = db.updateRecords();
 
 				} else if (commandSplit[0].equalsIgnoreCase("delete")) {
 					recordAccess = loggedInUser.deleteRecord(rec);
@@ -199,7 +201,7 @@ public class server implements Runnable {
 						rec.delete();
 					}
 
-					records = db.getRecords();
+					records = db.updateRecords();
 				}
 
 				Log.append(loggedInUser.toString(), command, recordAccess);
