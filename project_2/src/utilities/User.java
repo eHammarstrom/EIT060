@@ -79,6 +79,9 @@ public abstract class User implements Serializable {
 	 */
 
 	public boolean readRecord(Record r) {
+		if(r == null) {
+		 	return false;
+		}
 		return r.read(this);
 	}
 	
@@ -89,6 +92,9 @@ public abstract class User implements Serializable {
 	 */
 
 	public boolean writeRecord(Record r) {
+		if(r == null) {
+			return false;
+		}
 		return r.write(this);
 	}
 	
@@ -99,10 +105,10 @@ public abstract class User implements Serializable {
 	 */
 	
 	public boolean deleteRecord(Record r) {
-		if(r != null) {
-			return r.delete(this);
+		if(r == null) {
+			return false;
 		}
-		return false;
+		return r.delete(this);
 	}
 	
 	/***
