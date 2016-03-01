@@ -52,24 +52,15 @@ public class client {
 		try { /* set up a key manager for client authentication */
 			SSLSocketFactory factory = null;
 			try {
-				// char[] password = "password".toCharArray();
 				KeyStore ks = KeyStore.getInstance("JKS");
 				KeyStore ts = KeyStore.getInstance("JKS");
 				KeyManagerFactory kmf = KeyManagerFactory.getInstance("SunX509");
 				TrustManagerFactory tmf = TrustManagerFactory.getInstance("SunX509");
 				SSLContext ctx = SSLContext.getInstance("TLS");
-
 				BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
 				System.out.print("Enter keystore: ");
-
 				String keystoreName = br.readLine();
-
-				// System.out.print("\nEnter password: ");
-
-				// String pwRead = br.readLine();
-				// char[] password = pwRead.toCharArray();
-
 				Console cons = System.console();
 
 				if (cons != null) {
@@ -79,22 +70,9 @@ public class client {
 							"Cannot find a console to read password from. Eclipse CANNOT fork a terminal child process.");
 				}
 
-				/**
-				 * JAVA INVISIBLE READ EXAMPLE
-				 * 
-				 * Console cons; char[] passwd; if ((cons = System.console()) !=
-				 * null && (passwd = cons.readPassword("[%s]", "Password:")) !=
-				 * null) { ... java.util.Arrays.fill(passwd, ' '); }
-				 * 
-				 */
-
-				ks.load(new FileInputStream("keystores/" + keystoreName), password); // keystore
-				// password
-				// (storepass)
+				ks.load(new FileInputStream("keystores/" + keystoreName), password); // keystore password (storepass)
 				char[] cliTrustPW = "password".toCharArray();
-				ts.load(new FileInputStream("clienttruststore"), cliTrustPW); // truststore
-																				// password
-																				// (storepass);
+				ts.load(new FileInputStream("clienttruststore"), cliTrustPW); // truststore password (storepass);
 				kmf.init(ks, password); // user password (keypass)
 				tmf.init(ts); // keystore can be used as truststore here
 				ctx.init(kmf.getKeyManagers(), tmf.getTrustManagers(), null);
@@ -103,6 +81,7 @@ public class client {
 				e.printStackTrace();
 				throw new IOException(e.getMessage());
 			}
+
 			SSLSocket socket = (SSLSocket) factory.createSocket(host, port);
 			System.out.println("Handshake socket: " + socket + "\n");
 
@@ -146,12 +125,14 @@ public class client {
 			boolean accessDenied = false;
 
 			while (!isDone) {
+				
 				if (accessDenied) {
 					System.out.println("Access denied, or no such record exists! \n Type 'help' for commands.");
 				}
 
 				System.out.print(user.getUsername() + " commands>");
 				msg = read.readLine();
+				fetchRecords();
 				splitMsg = msg.split("\\s+");
 
 				try {
@@ -176,7 +157,6 @@ public class client {
 								accessDenied = false;
 							}
 						}
-
 						fetchRecords();
 					} else if (splitMsg[0].equalsIgnoreCase("create") && (accessDenied = hasPermissions(msg))) {
 						createRecord();
@@ -207,12 +187,7 @@ public class client {
 	private static void fetchRecords() throws ClassNotFoundException, IOException {
 		out.println("recordfetch");
 		out.flush();
-
 		records = (ArrayList<Record>) ois.readObject();
-
-		System.out.println("Printing fetched records: ");
-		for (Record r : records)
-			System.out.println(r.getId() + " " + r.getMedicalData());
 	}
 
 	/**
@@ -273,7 +248,7 @@ public class client {
 		boolean isDone = false;
 
 		while (!isDone) {
-			System.out.println("CREATE as <doctorName> <nurseName> <patientName> <division> <medicalData>: ");
+			System.out.println("CREATE as <nurseName> <patientName> <division> <medicalData>: ");
 			msg = read.readLine();
 			System.out.println("Save created record? <yes>/<no>");
 			String ans = read.readLine();

@@ -51,7 +51,7 @@ public class Record implements Serializable {
 	}
 
 	public String toString() {
-		return Long.toString(id);
+		return Long.toString(id) + " " + medicalData;
 	}
 	
 	/***

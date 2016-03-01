@@ -69,7 +69,6 @@ public class server implements Runnable {
 			users = db.getUsers();
 			records = db.getRecords();
 
-			User loggedInUser = null;
 			boolean isLogin = false;
 			User login = null;
 
@@ -77,9 +76,7 @@ public class server implements Runnable {
 			 * Check if connected client is a user according to their certificate.
 			 */
 			for (User u : users) {
-				System.out.println(cert.getSerialNumber().toString());
 				login = u.login(cert.getSerialNumber().toString());
-				loggedInUser = u;
 				if (login != null) {
 					isLogin = true;
 					break;
@@ -93,14 +90,8 @@ public class server implements Runnable {
 			oos.writeObject(login);
 			oos.flush();
 
-			if (login != null)
-				System.out.println("Sent user: \t" + login.toString());
-			else
-				System.out.println("Sent user: \tNULL");
-
 			// If user is associated to records post them to client.
 			if (login != null && !records.isEmpty()) {
-
 				ArrayList<Record> userRecords = getUserRecords(login);
 
 				oos.writeObject(userRecords);
@@ -115,31 +106,20 @@ public class server implements Runnable {
 			while ((command = in.readLine()) != null) {
 				String[] commandSplit = command.split("\\s+");
 
-				for (String s : commandSplit) {
-					System.out.println(s);
-				}
-
 				boolean recordAccess = true;
 				Record rec = null;
 
 				if (commandSplit[0].equalsIgnoreCase("recordfetch")) {
-					System.out.println("RECORD FETCH RECEIVED.");
-
-					ArrayList<Record> userRecords = getUserRecords(loggedInUser);
-
-					for (Record r : userRecords) {
-						System.out.println(r.getId() + " " + r.getMedicalData());
-					}
+					ArrayList<Record> userRecords = getUserRecords(login);
 
 					oos.writeObject(userRecords);
 					oos.flush();
 				} else if (commandSplit[0].equalsIgnoreCase("create")) {
-					recordAccess = loggedInUser.createRecord();
+					recordAccess = login.createRecord();
 					returnAccess(recordAccess, printWriter);
 
 					if (recordAccess) {
 						String[] recordData = in.readLine().split("\\s+");
-						String doctor = recordData[0];
 						String nurse = recordData[1];
 						String patient = recordData[2];
 						String division = recordData[3];
@@ -148,63 +128,53 @@ public class server implements Runnable {
 						for (int i = 4; i < recordData.length; i++)
 							medicalData += recordData[i] + " ";
 
-						Doctor d = (Doctor) db.getUserFromName(doctor);
+						Doctor d = (Doctor) login;
 						Nurse n = (Nurse) db.getUserFromName(nurse);
 						Patient p = (Patient) db.getUserFromName(patient);
 						Division div = db.getDivision(division);
 
 						if (d != null && n != null && p != null && division != null && medicalData != null) {
-							loggedInUser.createRecord(d, n, p, div, medicalData);
+							login.createRecord(d, n, p, div, medicalData);
 							printWriter.println("created");
 							printWriter.flush();
 						} else {
-							System.out.println("CANNOT CREATE RECORD -> NULL EXCEPTION");
 							printWriter.println("error");
 							printWriter.flush();
 						}
 					}
 
 					records = db.updateRecords();
-
 				} else {
 					for (Record r : records) {
 						if (Long.parseLong(commandSplit[1]) == r.getId()) {
-							System.out.println("Found requested record: " + r.getId());
 							rec = r;
 							break;
 						}
 					}
-
-					if (rec == null) {
-						System.out.println("RECORD DOES NOT EXIST!");
-					}
 				}
 
 				if (commandSplit[0].equalsIgnoreCase("read")) {
-					recordAccess = loggedInUser.readRecord(rec);
+					recordAccess = login.readRecord(rec);
 					returnAccess(recordAccess, printWriter);
 				} else if (commandSplit[0].equalsIgnoreCase("edit")) {
-					recordAccess = loggedInUser.writeRecord(rec);
+					recordAccess = login.writeRecord(rec);
 					returnAccess(recordAccess, printWriter);
 
 					if (recordAccess) {
 						rec.write(in.readLine());
+						records = db.updateRecords();
 					}
-
-					records = db.updateRecords();
-
 				} else if (commandSplit[0].equalsIgnoreCase("delete")) {
-					recordAccess = loggedInUser.deleteRecord(rec);
+					recordAccess = login.deleteRecord(rec);
 					returnAccess(recordAccess, printWriter);
 
 					if (recordAccess) {
 						rec.delete();
+						records = db.updateRecords();
 					}
-
-					records = db.updateRecords();
 				}
 
-				Log.append(loggedInUser.toString(), command, recordAccess);
+				Log.append(login.toString(), command, recordAccess);
 			}
 
 			printWriter.close();
@@ -239,7 +209,6 @@ public class server implements Runnable {
 
 		for (Record r : records) {
 			if (login.isAssociated(r)) {
-				System.out.println("Found associated record: " + r.getId());
 				userRecords.add(r);
 			} else if (login.getPermissions().equals(PermissionLevel.Agency)) {
 				userRecords.add(r);
@@ -298,12 +267,8 @@ public class server implements Runnable {
 				KeyStore ts = KeyStore.getInstance("JKS");
 				char[] password = "password".toCharArray();
 
-				ks.load(new FileInputStream("serverkeystore"), password); // keystore
-																			// password
-																			// (storepass)
-				ts.load(new FileInputStream("servertruststore"), password); // truststore
-																			// password
-																			// (storepass)
+				ks.load(new FileInputStream("serverkeystore"), password); // keystore password (storepass)
+				ts.load(new FileInputStream("servertruststore"), password); // truststore password (storepass)
 				kmf.init(ks, password); // certificate password (keypass)
 				tmf.init(ts); // possible to use keystore as truststore here
 				ctx.init(kmf.getKeyManagers(), tmf.getTrustManagers(), null);
