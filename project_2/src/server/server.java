@@ -128,13 +128,14 @@ public class server implements Runnable {
 						for (int i = 4; i < recordData.length; i++)
 							medicalData += recordData[i] + " ";
 
-						Doctor d = (Doctor) login;
-						Nurse n = (Nurse) db.getUserFromName(nurse);
-						Patient p = (Patient) db.getUserFromName(patient);
+						User d = login;
+						User n = db.getUserFromName(nurse);
+						User p = db.getUserFromName(patient);
 						Division div = db.getDivision(division);
+						
 
 						if (d != null && n != null && p != null && division != null && medicalData != null) {
-							login.createRecord(d, n, p, div, medicalData);
+							login.createRecord((Doctor) d, (Nurse) n, (Patient) p, div, medicalData);
 							printWriter.println("created");
 							printWriter.flush();
 						} else {

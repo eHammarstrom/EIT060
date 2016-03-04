@@ -82,9 +82,11 @@ public class Record implements Serializable {
 	 */
 
 	public boolean write(User user) {
-		if (user.getPermissions().equals(PermissionLevel.Doctor) && user.getDivision().equals(doctor.getDivision())) {
+		if (user.getPermissions().equals(PermissionLevel.Doctor) 
+				&& user.getCertNbr().equals(doctor.getCertNbr())) {
 			return true;
-		} else if (user.getPermissions().equals(PermissionLevel.Nurse) && user.getCertNbr() == nurse.getCertNbr()) {
+		} else if (user.getPermissions().equals(PermissionLevel.Nurse) 
+				&& user.getCertNbr() == nurse.getCertNbr()) {
 			return true;
 		}
 
