@@ -70,9 +70,13 @@ public class client {
 							"Cannot find a console to read password from. Eclipse CANNOT fork a terminal child process.");
 				}
 
-				ks.load(new FileInputStream("keystores/" + keystoreName), password); // keystore password (storepass)
+				ks.load(new FileInputStream("keystores/" + keystoreName), password); // keystore
+																						// password
+																						// (storepass)
 				char[] cliTrustPW = "password".toCharArray();
-				ts.load(new FileInputStream("clienttruststore"), cliTrustPW); // truststore password (storepass);
+				ts.load(new FileInputStream("clienttruststore"), cliTrustPW); // truststore
+																				// password
+																				// (storepass);
 				kmf.init(ks, password); // user password (keypass)
 				tmf.init(ts); // keystore can be used as truststore here
 				ctx.init(kmf.getKeyManagers(), tmf.getTrustManagers(), null);
@@ -125,7 +129,7 @@ public class client {
 			boolean accessDenied = false;
 
 			while (!isDone) {
-				
+
 				if (accessDenied) {
 					System.out.println("Access denied, or no such record exists! \n Type 'help' for commands.");
 				}
@@ -178,9 +182,10 @@ public class client {
 			e.printStackTrace();
 		}
 	}
-	
+
 	/**
 	 * Query an update of the client-sided records from server.
+	 * 
 	 * @throws ClassNotFoundException
 	 * @throws IOException
 	 */
@@ -192,6 +197,7 @@ public class client {
 
 	/**
 	 * Query the server to check if user has permission x.
+	 * 
 	 * @param msg
 	 * @return
 	 * @throws IOException
@@ -210,6 +216,7 @@ public class client {
 	/**
 	 * Sets client command line in an editing state and submits data to server
 	 * unless it is interrupted by the user.
+	 * 
 	 * @param rNbr
 	 * @throws IOException
 	 */
@@ -240,8 +247,9 @@ public class client {
 	}
 
 	/**
-	 * Sets client command line in a Record creation state 
-	 * before submitting to server, unless interrupted by user.
+	 * Sets client command line in a Record creation state before submitting to
+	 * server, unless interrupted by user.
+	 * 
 	 * @throws IOException
 	 */
 	private static void createRecord() throws IOException {
@@ -257,12 +265,13 @@ public class client {
 				out.println(msg);
 				out.flush();
 				isDone = true;
-				System.out.println("Successfully created record.");
 			}
 		}
 
 		if (!serverMsg.readLine().equals("created"))
 			System.out.println("Input error.");
+		else
+			System.out.println("Successfully created record.");
 	}
 
 	/**
@@ -281,7 +290,7 @@ public class client {
 	 * Prints records associated to client user.
 	 */
 	private static void printRecords() {
-		if (!records.isEmpty()){
+		if (!records.isEmpty()) {
 			System.out.println("Associated records: ");
 
 			for (Record r : records) {
@@ -294,7 +303,9 @@ public class client {
 
 	/**
 	 * Prints specified record.
-	 * @param rNbr record ID
+	 * 
+	 * @param rNbr
+	 *            record ID
 	 */
 	private static void printRecord(String rNbr) {
 		for (Record r : records) {
@@ -305,7 +316,9 @@ public class client {
 	}
 
 	/**
-	 * Function awaits a User object followed by 0 or more Record objects in an array.
+	 * Function awaits a User object followed by 0 or more Record objects in an
+	 * array.
+	 * 
 	 * @return true if successful
 	 * @throws IOException
 	 * @throws ClassNotFoundException
@@ -320,7 +333,7 @@ public class client {
 		} else {
 			return false;
 		}
-		
+
 		printRecords();
 
 		return true;
